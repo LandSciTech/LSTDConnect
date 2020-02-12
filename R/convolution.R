@@ -104,8 +104,6 @@ uniformKernel<-function(dmax,cellDim=1,useAveDist=F){
 #' @export
 exponentialKernel<-function(dbar,cellDim=1,negligible=10^-10,returnScale=F,dmax=NULL){
   #Exponential kernel from Hughes et al 2015 American Naturalist
-  #dbar = 80;cellDim=1;negligible=10^-6
-
   dbarCell = dbar/cellDim
   if(is.null(dmax)){
     dmax = -0.5*dbarCell*log(pi*dbarCell^2*negligible/2)
@@ -120,15 +118,6 @@ exponentialKernel<-function(dbar,cellDim=1,negligible=10^-10,returnScale=F,dmax=
   if(returnScale){
     return(sum(m))
   }
-
   k = m/sum(m)
-
-  #if(returnConvKern){
-  #  temp = spatialfil::convKernel(sigma = 1, k = c("gaussian"))
-  #  temp$matrix=k
-  #  temp$kernel="exponential"
-  #  temp$sigma = dbarCell
-  #  return(temp)
-  #}
   return(k)
 }
