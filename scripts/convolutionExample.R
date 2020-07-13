@@ -13,7 +13,7 @@ exQuality=nlm_mpd(ncol=200,nrow=200,resolution=1,roughness=0.9,rand_dev=1)
 plot(exQuality)
 
 #Redistribution kernel examples
-exponentialKernel(1,negligible=10^-6) #exponential kernel with mean dispersal distance of 1. Note the tail of the kernel (density < 10^-6) is truncated.
+exponentialKernel(0.3,negligible=10^-6) #exponential kernel with mean dispersal distance of 1. Note the tail of the kernel (density < 10^-6) is truncated.
 uniformKernel(1,useAveDist=T) #uniform kernel with mean dispersal distance of 1
 uniformKernel(1,useAveDist=F) #uniform kernel with max dispersal distance of 1
 sum(exponentialKernel(1)) #sum of discretized redistribution kernel is always 1

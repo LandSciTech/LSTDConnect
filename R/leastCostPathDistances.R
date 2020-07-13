@@ -15,7 +15,7 @@ setGeneric('leastCostPathDistances',function(patches,cost,maxDist,bufferedPatche
 #' @return List of effective distance d_ij matrices for each subgraph.
 #' @rdname leastCostPathDistances
 setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(patches,cost,maxDist,bufferedPatches) {
-  #patches=cPatches; cost=cCost;bufferedPatches=!is.na(cPatches)
+  #patches=cp; cost=cCost;bufferedPatches=cBuff;maxDist=cd
   checkAllign = raster::compareRaster(patches,cost)
   if(!checkAllign){
     stop("All input rasters must have the same same extent, number of rows and columns,projection, resolution, and origin.")
@@ -40,6 +40,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
   #cost[!is.na(cost)]=cRes[1]
   sim = roads::roadCLUS.getGraph(sim=list(costSurface=cost))
 
+  #sim = roadCLUS.getGraph(sim=list(costSurface=cost))
   #id clusters and loop over each cluster
   buffClumps = raster::clump(bufferedPatches)
   #plot(buffClumps)
@@ -60,6 +61,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
     #sort( sapply(ls(),function(x){object.size(get(x))}))
 
     igDists = igraph::distances(sim$g,v=fromV,to=toV)
+    
     igDists[is.infinite(igDists)]=NA
 
     cPatches=NULL;cCost=NULL
