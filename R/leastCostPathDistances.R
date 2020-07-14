@@ -27,6 +27,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
     buffDist = maxDist/costMin
     bufferedPatches = lsBuffer(patches,maxDist)
   }
+
   bufferedPatches[bufferedPatches==0]=NA
   #plot(bufferedPatches)
   patches[is.na(bufferedPatches)]=NA
@@ -61,7 +62,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
     #sort( sapply(ls(),function(x){object.size(get(x))}))
 
     igDists = igraph::distances(sim$g,v=fromV,to=toV)
-    
+
     igDists[is.infinite(igDists)]=NA
 
     cPatches=NULL;cCost=NULL
