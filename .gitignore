@@ -3,4 +3,8 @@
 .RData
 .Ruserdata
 LSTDConnectInstall.R
+<<<<<<< HEAD
 LSTDConnect.Rproj
+=======
+.Rproj
+>>>>>>> 383f82b7af15e2e4f56d6d1ddd3576d2ce64861c
