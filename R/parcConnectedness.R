@@ -39,15 +39,16 @@ setMethod(f = 'initialize', signature = "ParcConnectedness", definition = functi
 #' @param region RasterLayer or character string. Optional. Areas to treat as distinct in calculations. If x is a ParcConnectedness object region should be one or more names of the d_ij list.
 #' @param memoryLimit Number. Total number of GB to allocate to d_ij list. When size of d_ij list exceeds this limit calculations will be done, but matrices will not be retained and returned.
 #' @param stopOnMemoryLimit Boolean. If true algorithm will return error if expected memory requirement is greater than available memory.
+#' @param neighbourhood Character. 'rook','queen', or 'octagon'. 'octagon' option is a modified version of the queen's 8 cell neighbourhood in which diagonals weights are 2^0.5x higher than horizontal/vertical weights.
 #' @return A ParcConnectedness object including patches, effective distance d_ij matrix, habitat value H_j vector, M_i maps, average metric value for each patch Mbar_p, data frame average metric of all patches Mbar.
 #' @examples
 #' # TO DO: examples
 #' #TO DO: define parcConnectedness for other input signatures.
 #' @export
-setGeneric('parcConnectedness',function(x,habitatValue=NULL,distanceMethod="leastCostPaths",maxDist=500,alpha=c(2,25,100),metric="connectivity",region=NULL,memoryLimit =1,stopOnMemoryLimit=T) standardGeneric('parcConnectedness'))
+setGeneric('parcConnectedness',function(x,habitatValue=NULL,distanceMethod="leastCostPaths",maxDist=500,alpha=c(2,25,100),metric="connectivity",region=NULL,memoryLimit =1,stopOnMemoryLimit=T,neighbourhood="octagon") standardGeneric('parcConnectedness'))
 
 #' @rdname parcConnectedness
-setMethod('parcConnectedness', signature(x="ParcConnectedness"), function(x,habitatValue,distanceMethod,maxDist,alpha,metric,region,memoryLimit,stopOnMemoryLimit) {
+setMethod('parcConnectedness', signature(x="ParcConnectedness"), function(x,habitatValue,distanceMethod,maxDist,alpha,metric,region,memoryLimit,stopOnMemoryLimit,neighbourhood) {
   #x=initPC
   metricOptions = c("connectivity","colonization potential")
   if(!is.element(metric,metricOptions)){
@@ -76,7 +77,7 @@ setMethod('parcConnectedness', signature(x="ParcConnectedness"), function(x,habi
   for(cl in clumpSet){
     #cl="clump1"
 
-    x@H_j[[cl]]=x@H_j[[cl]][is.element(colnames(x@d_ij[[cl]]),rownames(x@d_ij[[cl]]))]
+    x@H_j[[cl]]=x@H_j[[cl]][is.element(colnames(x@d_ij[[cl]]),colnames(x@d_ij[[cl]]))]
 
     pId = getVs(x@patches,id=F,locs = rownames(x@d_ij[[cl]]))
     R_all = data.frame(alpha=NA,patchId = NA,R_i=NA)
@@ -139,10 +140,10 @@ setMethod('parcConnectedness', signature(x="ParcConnectedness"), function(x,habi
 })
 
 #' @rdname parcConnectedness
-setMethod('parcConnectedness', signature(x="RasterStack"), function(x,habitatValue,distanceMethod,maxDist,alpha, metric,region,memoryLimit,stopOnMemoryLimit) {
+setMethod('parcConnectedness', signature(x="RasterStack"), function(x,habitatValue,distanceMethod,maxDist,alpha, metric,region,memoryLimit,stopOnMemoryLimit,neighbourhood) {
   #x=stack(fPatch,exCost,qSurface);distanceMethod="leastCostPaths";maxDist=maxDistHold*res(qSurface)[1];alpha=2/(dbar*res(qSurface)[1]);region=NULL;memoryLimit=0;metric="connectivity";stopOnMemoryLimit=F
   #x=exDat;distanceMethod="leastCostPaths";maxDist=25;alpha=5;region=NULL;memoryLimit=0;metric="colonization potential"
-
+  #x=stack(testPatch,oneMap,exQuality);neighbourhood="octagon";distanceMethod="leastCostPaths";maxDist=nrow(exponentialKernel(dbar,negligible=10^-6));alpha=2/dbar;memoryLimit=0;stopOnMemoryLimit=T
   names(x)=c("patches","cost","habitatValue")
 
   distMethods = c("leastCostPaths")
@@ -189,8 +190,9 @@ setMethod('parcConnectedness', signature(x="RasterStack"), function(x,habitatVal
     #sort( sapply(ls(),function(x){object.size(get(x))}))
     if(distanceMethod=="leastCostPaths"){
 
-      d_ij = leastCostPathDistances(cPatches,cCost,maxDist,bufferedPatches=!is.na(cPatches))
+      d_ij = leastCostPathDistances(cPatches,cCost,maxDist,bufferedPatches=!is.na(cPatches),neighbourhood=neighbourhood)
     }
+    
 
     #leastCostPathDistances includes check for exceeding memory requirements. Figure out how to reduce problem at this point.
 
@@ -204,6 +206,7 @@ setMethod('parcConnectedness', signature(x="RasterStack"), function(x,habitatVal
       #nn="clump1"
       hv = x$habitatValue
       hv[!is.na(cPatches)&is.na(hv)]=0
+      colnames(d_ij[[nn]])
       H_j[[nn]] = getVs(hv,id=F,locs = colnames(d_ij[[nn]]),omit0=F)
       hv=NULL
     }
@@ -219,7 +222,7 @@ setMethod('parcConnectedness', signature(x="RasterStack"), function(x,habitatVal
     #alpha=2/c(5000,1000);stopOnMemoryLimit=F
 
 
-    cPC = parcConnectedness(initPC,alpha=alpha,memoryLimit=memoryLimit,metric=metric,stopOnMemoryLimit = stopOnMemoryLimit)
+    cPC = parcConnectedness(initPC,alpha=alpha,memoryLimit=memoryLimit,metric=metric,stopOnMemoryLimit = stopOnMemoryLimit,neighbourhood=neighbourhood)
 
     outPC = mergeParcConnectedness(cPC,outPC,memoryLimit=memoryLimit,clumpName = ic)
   }

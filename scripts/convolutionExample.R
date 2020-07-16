@@ -49,3 +49,18 @@ viewStack = stack(dwMean5,tbMean5,tbMax5);names(viewStack)=c("exp mean 5","unif 
 plot(viewStack)
 #Note exponential and uniform kernels with mean distance of 5 are more similar to one another than either is to the uniform kernel with a 5 unit radius.
 
+#parc
+oneMap = exQuality;oneMap[oneMap!=1]=1
+testPatch = oneMap
+edge = 75
+testPatch[1:edge,]=0
+testPatch[,1:edge]=0
+testPatch[(nrow(testPatch)-edge):nrow(testPatch),]=0
+testPatch[,(nrow(testPatch)-edge):nrow(testPatch)]=0
+plot(testPatch)
+
+dbar=2
+testPC = parcConnectedness(x=stack(testPatch,oneMap,exQuality),maxDist=nrow(exponentialKernel(dbar,negligible=10^-6)),alpha=2/dbar,memoryLimit=0,stopOnMemoryLimit=T)
+plot(testPC@M_i)
+
+plot(stack(testPC@M_i,exQuality))

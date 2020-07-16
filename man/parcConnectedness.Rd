@@ -10,17 +10,17 @@
 parcConnectedness(x, habitatValue = NULL,
   distanceMethod = "leastCostPaths", maxDist = 500, alpha = c(2, 25,
   100), metric = "connectivity", region = NULL, memoryLimit = 1,
-  stopOnMemoryLimit = T)
+  stopOnMemoryLimit = T, neighbourhood = "octagon")
 
 \S4method{parcConnectedness}{ParcConnectedness}(x, habitatValue = NULL,
   distanceMethod = "leastCostPaths", maxDist = 500, alpha = c(2, 25,
   100), metric = "connectivity", region = NULL, memoryLimit = 1,
-  stopOnMemoryLimit = T)
+  stopOnMemoryLimit = T, neighbourhood = "octagon")
 
 \S4method{parcConnectedness}{RasterStack}(x, habitatValue = NULL,
   distanceMethod = "leastCostPaths", maxDist = 500, alpha = c(2, 25,
   100), metric = "connectivity", region = NULL, memoryLimit = 1,
-  stopOnMemoryLimit = T)
+  stopOnMemoryLimit = T, neighbourhood = "octagon")
 }
 \arguments{
 \item{x}{RasterStack, matrix or ParcConnectedness object. RasterStack of patches, cost, and habitatValue will be passed to distanceMethod for calculation of d_ij effective distance matrix. Or pass in precalculated effective distance matrix d_ij or ParcConnectedness object for increased computational efficiency.}
@@ -40,6 +40,8 @@ parcConnectedness(x, habitatValue = NULL,
 \item{memoryLimit}{Number. Total number of GB to allocate to d_ij list. When size of d_ij list exceeds this limit calculations will be done, but matrices will not be retained and returned.}
 
 \item{stopOnMemoryLimit}{Boolean. If true algorithm will return error if expected memory requirement is greater than available memory.}
+
+\item{neighbourhood}{Character. 'rook','queen', or 'octagon'. 'octagon' option is a modified version of the queen's 8 cell neighbourhood in which diagonals weights are 2^0.5x higher than horizontal/vertical weights.}
 }
 \value{
 A ParcConnectedness object including patches, effective distance d_ij matrix, habitat value H_j vector, M_i maps, average metric value for each patch Mbar_p, data frame average metric of all patches Mbar.
