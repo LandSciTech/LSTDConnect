@@ -7,14 +7,15 @@
 #' @param cost RasterLayer. Cost. Must be >0. Set cost=1 for euclidean distance.
 #' @param maxDist Numeric. Maximum distance between i and j in map units.
 #' @param bufferedPatches RasterLayer. Optional. If provided maxDist will be ignored. bufferedPatches defines the calculation region - use to restrict calculations to a portion of the map area.
+#' @param neighbourhood Character. 'rook','queen', or 'octagon'. 'octagon' option is a modified version of the queen's 8 cell neighbourhood in which diagonals weights are 2^0.5x higher than horizontal/vertical weights.
 #' @examples
 #' # TO DO: examples
 #' @export
-setGeneric('leastCostPathDistances',function(patches,cost,maxDist,bufferedPatches) standardGeneric('leastCostPathDistances'))
+setGeneric('leastCostPathDistances',function(patches,cost,maxDist,bufferedPatches,neighbourhood='octagon') standardGeneric('leastCostPathDistances'))
 
 #' @return List of effective distance d_ij matrices for each subgraph.
 #' @rdname leastCostPathDistances
-setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(patches,cost,maxDist,bufferedPatches) {
+setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(patches,cost,maxDist,bufferedPatches,neighbourhood) {
   #patches=cp; cost=cCost;bufferedPatches=cBuff;maxDist=cd
   checkAllign = raster::compareRaster(patches,cost)
   if(!checkAllign){
@@ -39,7 +40,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
   #sort( sapply(ls(),function(x){object.size(get(x))}))
 
   #cost[!is.na(cost)]=cRes[1]
-  sim = roads::roadCLUS.getGraph(sim=list(costSurface=cost))
+  sim = roads::roadCLUS.getGraph(sim=list(costSurface=cost),neighbourhood = neighbourhood)
 
   #sim = roadCLUS.getGraph(sim=list(costSurface=cost))
   #id clusters and loop over each cluster
