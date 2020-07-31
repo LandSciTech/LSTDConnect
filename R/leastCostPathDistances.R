@@ -40,7 +40,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
   #sort( sapply(ls(),function(x){object.size(get(x))}))
 
   #cost[!is.na(cost)]=cRes[1]
-  sim = roads::roadCLUS.getGraph(sim=list(costSurface=cost),neighbourhood = neighbourhood)
+  sim = roadCLUS.getGraph(sim=list(costSurface=cost),neighbourhood = neighbourhood)
 
   #sim = roadCLUS.getGraph(sim=list(costSurface=cost))
   #id clusters and loop over each cluster

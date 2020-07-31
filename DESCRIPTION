@@ -22,7 +22,8 @@ Imports:
     dplyr,
     rgeos,
     sp,
-    roads,
+    data.table,
+    SpaDES.tools,
     igraph,
     velox,
     spatialfil
@@ -35,6 +36,5 @@ Collate:
     'leastCostPathDistances.R'
     'lsBuffer.R'
     'parcConnectedness.R'
-    'visFunctions.R'
 Suggests: 
     testthat
