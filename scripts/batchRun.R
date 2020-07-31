@@ -5,15 +5,6 @@
 #   Run batchSetup.R to create the empty database.
 #   LSTDConnect/output/'experimentname'/'experimentname'DB.sqlite
 
-#load library and source files into the environment.
-library(DBI); library(RSQLite);library(tidyverse);library(dbplyr);
-library(stringr);library(raster)
-#Use local dev version of LSTDConnect package.
-devtools::document();devtools::load_all()
-#library(LSTDConnect) 
-source("scripts/batchHelperFns.R")
-library(parallel)
-
 # Parameters
 ###################################################
 #set the name of the experiment to resume.
@@ -25,10 +16,41 @@ myDBName= paste0("output/", exptName,"/",exptName,"DB.sqlite")
 #set the batch size
 Nbatch=2
 
-################################################################
-#connect to database.
-myDB<- dbConnect(RSQLite::SQLite(), myDBName)
+#########################
+#load library and source files into the environment.
+#Note: for parallel processing need to use package installed from github rather than local dev version.
+#Ensure any recent changes to the package have been committed before proceeding
+if(0){# reinstall package if necessary.
+  Sys.setenv(TZ = "UTC")
+  #deps <- tools::package_dependencies("LSTDConnect", recursive = TRUE)
+  #update.packages(oldPkgs = unlist(deps), ask = FALSE)
+  devtools::install_github("LandSciTech/LSTDConnect")
+}
+library(LSTDConnect)
+library(DBI); library(RSQLite);library(tidyverse);library(dbplyr);
+library(stringr);library(raster)
+library(parallel)
+library(samc)
+source("scripts/batchHelperFns.R")
 
+################################################################
+#run one to check for obvious errors
+dbL <- DBI::dbConnect(RSQLite::SQLite(), myDBName)
+exptSel = tbl(dbL,sql("SELECT * FROM expt")) %>%
+                arrange(sampleRowID) %>% head(n=100) %>% collect()
+DBI::dbDisconnect(dbL)
+lcdir="./nonVersionedInput/LayerCatalog/"
+omaps<- applyBufferedSum(indir = lcdir, expt.row = exptSel[2,])
+plot(omaps$bufsum.Patch)#;plot(omaps$fPatch,add=T)
+
+check = processingFunction(Nbatch=2,myDBName=myDBName,exptName=exptName,
+                           innerFn=applyBufferedSum,initWait=0,continue=F,printError=T)
+#see example output
+example= raster(paste0("output/", exptName,"/maps/2.tif"))
+plot(example)
+
+#####################
+#run in parallel
 no_cores <- detectCores() - 1
 results=c(1:no_cores)
 
@@ -37,17 +59,16 @@ cl <- makeCluster(no_cores)
 clusterEvalQ(cl, library(DBI))
 clusterEvalQ(cl, library(dbplyr))
 clusterEvalQ(cl, library(dplyr))
-clusterEvalQ(cl, source("scripts/batchHelperFns.R"))
 clusterEvalQ(cl,library(samc))
 clusterEvalQ(cl, library(LSTDConnect))
 clusterEvalQ(cl, library(raster))
 
 #Apply processingFunction in parallel.
 #See batchHelperFns.R for processingFunction and applyBufferedSum code.
+#If database access conflicts try increasing initWait parameter.
 testResPar = parLapply(cl,results,processingFunction,Nbatch=Nbatch,myDBName=myDBName,exptName=exptName,
-                       innerFn=applyBufferedSum,continue=T)
+                       innerFn=applyBufferedSum,initWait=10,continue=T)
 stopCluster(cl)
-dbDisconnect(myDB)
 #Output
 #####################################
 # 1. writes map to /maps folder under the '/experiment name' directory. Map filename is the scnID for that particular scenario.

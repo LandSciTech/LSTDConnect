@@ -1,6 +1,6 @@
 
-processingFunction<-function(threadId,Nbatch,myDBName,exptName,innerFn,continue,lcdir="./nonVersionedInput/LayerCatalog/"){
-  #threadID=1;innerFn = applyBufferedSum;Nbatch=1000;continue = T;lcdir="./nonVersionedInput/LayerCatalog/"
+processingFunction<-function(threadId,Nbatch,myDBName,exptName,innerFn,continue,initWait=240,printError=F,lcdir="./nonVersionedInput/LayerCatalog/"){
+  #threadID=1;innerFn = applyBufferedSum;Nbatch=1;continue = T;lcdir="./nonVersionedInput/LayerCatalog/"
   batchDir =paste0("output/",exptName,"/tabs")
   mapDir = paste0("output/",exptName,"/maps")
 
@@ -13,7 +13,7 @@ processingFunction<-function(threadId,Nbatch,myDBName,exptName,innerFn,continue,
   batchNames=c()
   waitTime = 20*runif(1)+10
 
-  Sys.sleep(runif(1)*240)
+  Sys.sleep(runif(1)*initWait)
   while(continue|first){
     first=F
     dbL <- try(DBI::dbConnect(RSQLite::SQLite(), myDBName),silent=T)
@@ -27,7 +27,7 @@ processingFunction<-function(threadId,Nbatch,myDBName,exptName,innerFn,continue,
 
     exptSel = try(tbl(dbL,sql("SELECT * FROM expt")) %>% filter(status=="not done") %>%
       arrange(sampleRowID) %>% head(n=Nbatch) %>% collect(),silent=T)
-    #exptSel = tbl(dbL,sql("SELECT * FROM expt")) %>% filter(status=="done") %>%  arrange(sampleRowID) %>% head(n=Nbatch) %>% collect()
+    #exptSel = tbl(dbL,sql("SELECT * FROM expt")) %>% filter(status=="in progress") %>%  arrange(sampleRowID) %>% head(n=Nbatch) %>% collect()
 
       #exptSel = tbl(dbL,sql("SELECT * FROM expt")) %>% filter(status=="in progress") %>%  arrange(sampleRowID) %>% head(n=Nbatch) %>% collect()
     #exptSel = tbl(dbL,sql("SELECT * FROM expt"))%>% filter(status=="not done") %>% arrange(sampleRowID) %>% collect()
@@ -80,6 +80,9 @@ processingFunction<-function(threadId,Nbatch,myDBName,exptName,innerFn,continue,
         #write error reports to table directory.
         write.csv(x= data.frame("scenario" = c(exptSel$scnID[i]), "error" = omaps[1]), file = paste0(batchDir,"/errorReport/", exptSel$scnID[i],".csv"), row.names = F)
 
+        if(printError){
+          stop(omaps[1])
+        }
         if(grepl("cannot allocate vector of size",scn.outputTab$resultsPath[scn.outputTab$scnID==exptSel$scnID[i]],fixed=T)){
           next
         }else{next}
@@ -160,7 +163,7 @@ applyBufferedSum<- function(indir,expt.row,maxFocalPatchCells=15000){
   #exptSel$rowID=seq(1:nrow(exptSel));exptSel$rowID[exptSel$paArea==min(exptSel$paArea)]
   #exptSel$rowID=seq(1:nrow(exptSel));exptSel$rowID[exptSel$paID==4354]
 
-  #indir = lcdir; expt.row = exptSel[11,]
+  #indir = lcdir; expt.row = exptSel[1,]
 
   #unique(subset(exptSel,paArea>3000000,select=c(paID,paArea,nameEco)))
 
