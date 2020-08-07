@@ -23,11 +23,10 @@ Imports:
     rgeos,
     sp,
     data.table,
-    SpaDES.tools,
     igraph,
     velox,
     spatialfil
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Collate: 
     'AAAClassDefinitions.R'
     'helperFns.R'
