@@ -181,7 +181,6 @@ setMethod('parcConnectedness', signature(x="RasterStack"), function(x,habitatVal
   for (ic in clumps){
     #ic=clumps[1]
   
-
     cPatches=patches; cPatches[buffClumps!=ic]=NA;cPatches[is.na(buffClumps)]=NA
     isPatches=cellStats(cPatches,"sum")
     if(isPatches==0){stop("There are no patches for parc calculation B.")}
