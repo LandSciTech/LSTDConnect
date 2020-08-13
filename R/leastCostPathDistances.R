@@ -16,7 +16,7 @@ setGeneric('leastCostPathDistances',function(patches,cost,maxDist,bufferedPatche
 #' @return List of effective distance d_ij matrices for each subgraph.
 #' @rdname leastCostPathDistances
 setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(patches,cost,maxDist,bufferedPatches,neighbourhood) {
-  #patches=cp; cost=cCost;bufferedPatches=cBuff;maxDist=cd
+  #patches=cPatches; cost=cCost;bufferedPatches=!is.na(cPatches);maxDist=maxDist
   checkAllign = raster::compareRaster(patches,cost)
   if(!checkAllign){
     stop("All input rasters must have the same same extent, number of rows and columns,projection, resolution, and origin.")
@@ -40,6 +40,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
   #sort( sapply(ls(),function(x){object.size(get(x))}))
 
   #cost[!is.na(cost)]=cRes[1]
+  #library(tidyverse);library(data.table)
   sim = roadCLUS.getGraph(sim=list(costSurface=cost),neighbourhood = neighbourhood)
 
   #sim = roadCLUS.getGraph(sim=list(costSurface=cost))
@@ -58,8 +59,19 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
     fromV = getVs(cPatches>0)
     toV = getVs(cCost,omit0=F)
 
-    #now have dimensions of d_ij. Pause here to assess whether problem exceeds available memory. If it does, return message to split problem.
 
+    #first try to allocation matrices - fail early if too big
+    checkMemory=NULL;gc()
+    checkMemory = try(matrix(0.0000001,nrow=length(fromV),ncol=length(toV)*20),silent=T)
+
+    if(inherits(checkMemory,"try-error")){
+      stop(paste("Expecting memory problems. Try reducing focal patch size or the spatial scale parameter.",checkMemory)) 
+    }
+    checkMemory=NULL;gc()
+
+    #Goal here is to fail gracefully if memory requirements are excessive, before igraph crashes unceremoniously.
+    #The problem is I don't know how much memory igraph really needs. Clearly larger than output matrix size, but how big?
+    
     #sort( sapply(ls(),function(x){object.size(get(x))}))
 
     igDists = igraph::distances(sim$g,v=fromV,to=toV)

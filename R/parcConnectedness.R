@@ -141,10 +141,10 @@ setMethod('parcConnectedness', signature(x="ParcConnectedness"), function(x,habi
 
 #' @rdname parcConnectedness
 setMethod('parcConnectedness', signature(x="RasterStack"), function(x,habitatValue,distanceMethod,maxDist,alpha, metric,region,memoryLimit,stopOnMemoryLimit,neighbourhood) {
-  #x=stack(fPatch,exCost,qSurface);distanceMethod="leastCostPaths";maxDist=maxDistHold*res(qSurface)[1];alpha=2/(dbar*res(qSurface)[1]);region=NULL;memoryLimit=0;metric="connectivity";stopOnMemoryLimit=F
+  #x=stack(fPatch,exCost,qSurface);distanceMethod="leastCostPaths";maxDist=maxDistHold*res(qSurface)[1];alpha=2/(dbar*res(qSurface)[1]);region=NULL;memoryLimit=0;metric="connectivity";stopOnMemoryLimit=F;neighbourhood="octagon"
   #x=exDat;distanceMethod="leastCostPaths";maxDist=25;alpha=5;region=NULL;memoryLimit=0;metric="colonization potential"
   #x=stack(testPatch,oneMap,exQuality);neighbourhood="octagon";distanceMethod="leastCostPaths";maxDist=nrow(exponentialKernel(dbar,negligible=10^-6));alpha=2/dbar;memoryLimit=0;stopOnMemoryLimit=T
-  names(x)=c("patches","cost","habitatValue")
+    names(x)=c("patches","cost","habitatValue")
 
   distMethods = c("leastCostPaths")
   if(!is.element(distanceMethod,distMethods)){

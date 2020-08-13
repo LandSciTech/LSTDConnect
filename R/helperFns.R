@@ -1,3 +1,5 @@
+#' @import data.table
+#' @export
 roadCLUS.getGraph<- function(sim,neighbourhood){
   ###Set the grpah which determines least cost paths
   #Creates a graph (sim$g) in inititation phase which can be updated and solved for paths
@@ -16,7 +18,7 @@ roadCLUS.getGraph<- function(sim,neighbourhood){
     stop("neighbourhood type not recognized")
   }
   
-  edges<-1#SpaDES.tools::adj(returnDT= TRUE, numCol = ncol(ras.matrix), numCell=ncol(ras.matrix)*nrow(ras.matrix), directions =4, cells = 1:as.integer(ncol(ras.matrix)*nrow(ras.matrix)))
+  edges<-SpaDES.tools::adj(returnDT= TRUE, numCol = ncol(ras.matrix), numCell=ncol(ras.matrix)*nrow(ras.matrix), directions =4, cells = 1:as.integer(ncol(ras.matrix)*nrow(ras.matrix)))
   edges<-data.table::data.table(edges)
   #edges[from < to, c("from", "to") := .(to, from)]
   edges[edges$from < edges$to, ] <- edges[edges$from < edges$to, c('to','from')]
@@ -35,7 +37,7 @@ roadCLUS.getGraph<- function(sim,neighbourhood){
       mW = 2^0.5
     }else{mW=1}
     weight$weight = weight$weight*mW
-    edges<-1#SpaDES.tools::adj(returnDT= TRUE, numCol = ncol(ras.matrix), numCell=ncol(ras.matrix)*nrow(ras.matrix), directions ="bishop", cells = 1:as.integer(ncol(ras.matrix)*nrow(ras.matrix)))
+    edges<-SpaDES.tools::adj(returnDT= TRUE, numCol = ncol(ras.matrix), numCell=ncol(ras.matrix)*nrow(ras.matrix), directions ="bishop", cells = 1:as.integer(ncol(ras.matrix)*nrow(ras.matrix)))
     edges<-data.table::data.table(edges)
     
     #edges[from < to, c("from", "to") := .(to, from)]
