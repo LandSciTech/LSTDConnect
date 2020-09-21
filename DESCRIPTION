@@ -35,5 +35,6 @@ Collate:
     'leastCostPathDistances.R'
     'lsBuffer.R'
     'parcConnectedness.R'
+    'samcConnectedness.R'
 Suggests: 
     testthat
