@@ -30,6 +30,7 @@ RoxygenNote: 7.1.1
 Collate: 
     'AAAClassDefinitions.R'
     'helperFns.R'
+    'applySAMC.R'
     'convolution.R'
     'costs.R'
     'leastCostPathDistances.R'
