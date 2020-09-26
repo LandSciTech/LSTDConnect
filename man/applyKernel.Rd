@@ -4,36 +4,39 @@
 \alias{applyKernel}
 \alias{applyKernel,RasterLayer-method}
 \alias{applyKernel,RasterBrick-method}
-\title{Convolution of a raster with a kernel.}
+\title{Distance weighted sum convolution or intactness.}
 \usage{
 applyKernel(
   quality,
   d,
-  kernelShape,
+  kernel,
   patches = NULL,
   negligible = 10^-10,
-  useSpatialfil = F,
-  useAveDist = F
+  convolutionMethod = "focal",
+  useAveDist = F,
+  z = NA
 )
 
 \S4method{applyKernel}{RasterLayer}(
   quality,
   d,
-  kernelShape,
+  kernel,
   patches = NULL,
   negligible = 10^-10,
-  useSpatialfil = F,
-  useAveDist = F
+  convolutionMethod = "focal",
+  useAveDist = F,
+  z = NA
 )
 
 \S4method{applyKernel}{RasterBrick}(
   quality,
   d,
-  kernelShape,
+  kernel,
   patches = NULL,
   negligible = 10^-10,
-  useSpatialfil = F,
-  useAveDist = F
+  convolutionMethod = "focal",
+  useAveDist = F,
+  z = NA
 )
 }
 \arguments{
@@ -41,28 +44,32 @@ applyKernel(
 
 \item{d}{Numeric. Distance parameter. For euclidean kernel this is average dispersal distances. For uniform kernel this is width of buffer or average distance if useAveDist=T. In the units of x.}
 
-\item{kernelShape}{String. Exponential or Uniform}
+\item{kernel}{String or matrix. "Exponential" or "Uniform". If a matrix is supplied it will be used as the convolution kernel, and d/negligible/useAveDist arguments will be ignored.}
 
 \item{patches}{RasterLayer. Optional. Used to mask return layer if provided.}
 
 \item{negligible}{Numeric. Truncation value for exponential kernel.}
 
-\item{useSpatialfil}{Logical. Use spatialfil instead of velox. Slower (?), wrapped boundaries.}
+\item{convolutionMethod}{Character. focal, velox or spatialFil. focal default. Use spatialFil for wrapped boundaries. velox and focal return identical results, but velox is much faster.}
 
 \item{useAveDist}{Logical. If TRUE d is average dispersal distance for uniform kernels. Otherwise (default) d is buffer width.}
+
+\item{z}{Numeric. z parameter for intactness metric. If z=NA the output will be simple distance weighted sum.}
 }
 \value{
-A convolved RasterLayer - value of each pixel is kernel weighted neighbourhood average of quality.
+A RasterLayer - value of each pixel is kernel weighted neighbourhood average of quality, or intactness if z!=NA.
 
 A convolved RasterBrick - value of each pixel is kernel weighted neighbourhood average of quality.
 }
 \description{
-Convolution of a raster with a kernel.
+Distance weighted sum convolution or intactness.
 }
 \details{
-Exponential kernel as in Hughes2015.
+Exponential kernel as in Hughes et al 2015.
 
 Uniform kernel gives buffered sum.
+
+Intactness as in Beyer et al 2019.
 }
 \examples{
 # TODO: examples

@@ -23,9 +23,7 @@ Imports:
     rgeos,
     sp,
     data.table,
-    igraph,
-    velox,
-    spatialfil
+    igraph
 RoxygenNote: 7.1.1
 Collate: 
     'AAAClassDefinitions.R'
@@ -36,6 +34,5 @@ Collate:
     'leastCostPathDistances.R'
     'lsBuffer.R'
     'parcConnectedness.R'
-    'samcConnectedness.R'
 Suggests: 
     testthat

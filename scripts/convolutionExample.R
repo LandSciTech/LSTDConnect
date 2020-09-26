@@ -29,21 +29,21 @@ uniformKernel
 #Expample, exponential convolution kernel, euclidean distance
 dbar= 5
 #absorbing boundaries - note edge effects
-trMap = applyKernel(exQuality,dbar,kernelShape="Exponential",useSpatialfil = F)
+trMap = applyKernel(exQuality,dbar,kernel="Exponential",convolutionMethod = "focal")
 sum(values(exQuality))
 sum(values(trMap)) # Note loss from absorbing boundaries
 plot(trMap)
 #The value at each pixel of trMap is the distance weighted sum of the input map in the vicinity of that pixel.
 
 #wrapped boundaries - wrapped boundary conditions are useful avoiding edge effects on small simulated landscapes. Don't use with real data.
-dwMean5 = applyKernel(exQuality,dbar,kernelShape="Exponential",useSpatialfil = T)
+dwMean5 = applyKernel(exQuality,dbar,kernel="Exponential",convolutionMethod = "spatialFil")
 sum(values(exQuality))
 sum(values(dwMean5)) # The kernel is a redistribution function so the sum of the input and output maps should match more or less - there is a little numerical error.
 plot(stack(exQuality,dwMean5))
 
 #uniform convolution kernel, euclidean distance. This is a threshold based analysis or buffered sum.
-tbMax5 = applyKernel(exQuality,5,kernelShape="Uniform",useSpatialfil = T) #wrapped boundaries, buffer width = 5
-tbMean5 = applyKernel(exQuality,5,kernelShape="Uniform",useSpatialfil = T,useAveDist=T) #wrapped boundaries, mean dispersal distance = 5
+tbMax5 = applyKernel(exQuality,5,kernel="Uniform",convolutionMethod = "spatialFil") #wrapped boundaries, buffer width = 5
+tbMean5 = applyKernel(exQuality,5,kernel="Uniform",convolutionMethod="spatialFil",useAveDist=T) #wrapped boundaries, mean dispersal distance = 5
 
 viewStack = stack(dwMean5,tbMean5,tbMax5);names(viewStack)=c("exp mean 5","unif mean 5","unif max 5")
 plot(viewStack)
