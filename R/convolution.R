@@ -43,10 +43,10 @@ setMethod('applyKernel', signature(quality="RasterLayer"), function(quality,d,ke
     cellDim = res(quality)[1]
     dbar=d/cellDim
     
-    if(kernelShape=="Exponential"){
+    if(kernel=="Exponential"){
       k = exponentialKernel(dbar,negligible=negligible)
     }
-    if(kernelShape=="Uniform"){
+    if(kernel=="Uniform"){
       k = uniformKernel(dbar,useAveDist=useAveDist)
     }
   }

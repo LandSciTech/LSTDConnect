@@ -256,12 +256,12 @@ applyBufferedSum<- function(indir,expt.row,maxFocalPatchCells=15000){
 
   if(expt.row$metricVariant %in% c('uniform', 'Uniform')){
     bufsum.Patch=applyKernel(quality = qSurfaceC,
-                                               kernelShape = 'Uniform',
+                                               kernel = 'Uniform',
                                                d=expt.row$kernelScale*res(qSurface)[1],useAveDist=T)
   }
   if(expt.row$metricVariant %in% c('exponential', 'Exponential')){
     bufsum.Patch= applyKernel(quality = qSurfaceC,
-                                                kernelShape = 'Exponential',
+                                                kernel = 'Exponential',
                                                 d= expt.row$kernelScale*res(qSurface)[1],negligible=10^-6)
   }
   if(grepl('samc',expt.row$metricVariant)){
