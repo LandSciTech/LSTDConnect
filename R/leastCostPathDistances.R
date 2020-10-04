@@ -62,7 +62,7 @@ setMethod('leastCostPathDistances', signature(patches="RasterLayer"), function(p
 
     #first try to allocation matrices - fail early if too big
     checkMemory=NULL;gc()
-    checkMemory = try(matrix(0.0000001,nrow=length(fromV),ncol=length(toV)*3),silent=T)
+    checkMemory = try(matrix(0.0000001,nrow=length(fromV),ncol=length(toV)*2),silent=T)
 
     if(inherits(checkMemory,"try-error")){
       stop(paste("Expecting memory problems. Try reducing focal patch size or the spatial scale parameter.",checkMemory)) 
