@@ -1,17 +1,21 @@
 library(raster)
 library(NLMR)
 #Example landcover map
-exQuality=nlm_mpd(ncol=500,nrow=500,resolution=1,roughness=0.9,rand_dev=1)
+exQuality=nlm_mpd(ncol=10000,nrow=10000,resolution=1,roughness=0.9,rand_dev=1)
 exQuality = exQuality*140;exQuality[exQuality>100]=100
 #exQuality[!is.na(exQuality)]=80
 #exQuality[100,100]=100
 plot(exQuality)
 
-foc.w = exponentialKernel(10,negligible=10^-6) #exponential kernel with mean dispersal distance of 1. Note the tail of the kernel (density < 10^-6) is truncated.
+foc.w = exponentialKernel(1.5,negligible=10^-10) #exponential kernel with mean dispersal distance of 1. Note the tail of the kernel (density < 10^-6) is truncated.
 
 cc = applyKernel(exQuality,kernel=foc.w,convolutionMethod = "focal") #simple distance weighted sum using focal
 dd = applyKernel(exQuality,kernel=foc.w,convolutionMethod = "velox") #velox implementation
+
+ptm <- proc.time()
 ee = applyKernel(exQuality,kernel=foc.w,z=0.5) #qprime intactness
+tt = proc.time() - ptm
+
 plot(ee)
 plot(stack(exQuality,ee))
 

@@ -10,21 +10,24 @@ library(LSTDConnect)
 library(samc)
 
 #Example landcover map
-exQuality=nlm_mpd(ncol=200,nrow=200,resolution=1,roughness=0.9,rand_dev=1)
+exQuality=nlm_mpd(ncol=10000,nrow=10000,resolution=1,roughness=0.9,rand_dev=1)
 plot(exQuality)
 
 oneMap = exQuality;oneMap[exQuality!=1]=1
 
 #Example - variable mortality & occurence
 backgroundMortality = 10^-5
-t = 91
+t = 4
 resistance <- oneMap
 absorption <- oneMap*(backgroundMortality+(1/15)*(1-backgroundMortality)*(1-exQuality))
 plot(absorption)
 occurrence <- exQuality
 
 #return RasterLayer
-trMap = applySAMC(occurrence,absorption,resistance,t) 
+ptm <- proc.time()
+trMap = applySAMC(occurrence,absorption,resistance,t)
+tt = proc.time() - ptm
+
 plot(trMap)
 
 #no need for raster package if all inputs are matrices. output will also be a matrix

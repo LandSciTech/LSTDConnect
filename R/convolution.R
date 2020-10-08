@@ -86,6 +86,7 @@ setMethod('applyKernel', signature(quality="RasterLayer"), function(quality,d,ke
       #kShape[kShape!=0] = 1
       #dvec <- as.vector(k)
       #trMap <- focal(quality, kShape, fun= function(x){focalConvolve(x,dvec)}, pad=FALSE)
+      quality[is.na(quality)]=0
       trMap <- focal(quality, k, fun= sum, pad=FALSE)
       #TO DO: figure out what to do about PAD argument. 
     }
