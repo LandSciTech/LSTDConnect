@@ -23,7 +23,8 @@ Imports:
     rgeos,
     sp,
     data.table,
-    igraph
+    igraph,
+    samc
 RoxygenNote: 7.1.1
 Collate: 
     'AAAClassDefinitions.R'
