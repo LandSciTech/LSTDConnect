@@ -2,13 +2,13 @@ Package: LSTDConnect
 Type: Package
 Title: ECCC Landscape Science & Technology Division Connectivity Analysis Tools
 Version: 0.1.0
-Authors@R: 
+Authors@R:
     c(person(given = "Josie",
            family = "Hughes",
            role = c("aut", "cre"),
            email = "josie.hughes@canada.ca"),
     person(given="Her Majesty the Queen in Right of Canada, as represented by the Minister of Environment and Climate Change",
-           role = c("cph")))    
+           role = c("cph")))
 Maintainer: Josie Hughes <josie.hughes@canada.ca>
 Date: 2020-02-12
 URL:
@@ -24,10 +24,13 @@ Imports:
     sp,
     data.table,
     igraph,
-    samc
+    samc,
+    Rcpp
+LinkingTo: Rcpp
 RoxygenNote: 7.1.1
-Collate: 
+Collate:
     'AAAClassDefinitions.R'
+    'RcppExports.R'
     'helperFns.R'
     'applySAMC.R'
     'convolution.R'
@@ -35,5 +38,6 @@ Collate:
     'leastCostPathDistances.R'
     'lsBuffer.R'
     'parcConnectedness.R'
-Suggests: 
+    'samc.R'
+Suggests:
     testthat
