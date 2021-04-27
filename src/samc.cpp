@@ -22,11 +22,11 @@ inline void construct_cache(cache& ca, const std::vector<kernel_point_t>& kernel
   ca.nrow = permiability.nrow();
   ca.ncol = permiability.ncol();
   
-  if(!(ca.ncol * ca.nrow)){
+  if((ca.ncol * ca.nrow)==0){
     throw "There are no cells, nrow*ncol == 0";
   }
   
-  if(death_rate.ncol() != ca.ncol || death_rate.nrow() != ca.nrow){
+  if((std::size_t)(death_rate.ncol()) != ca.ncol || ((std::size_t)death_rate.nrow()) != ca.nrow){
     throw "death_rate's size does not match permiability's size";
   }
   
@@ -95,10 +95,12 @@ Rcpp::XPtr<samc::cache> cache_samc(
   
   std::vector<samc::kernel_point_t> kv{};
   
-  for(std::size_t y=0; y<kernel.nrow(); y++){
-    for(std::size_t x=0; x<kernel.ncol(); x++){
-      if(kernel[y+x*kernel.nrow()]){
-        kv.push_back({(std::ptrdiff_t)y-kernel.nrow()/2, (std::ptrdiff_t)x-kernel.ncol()/2, kernel[y+x*kernel.nrow()]});
+  const std::ptrdiff_t k_nrow = kernel.nrow();
+  const std::ptrdiff_t k_ncol = kernel.ncol();
+  for(std::ptrdiff_t y=0; y<k_nrow; y++){
+    for(std::ptrdiff_t x=0; x<k_ncol; x++){
+      if(kernel[y+x*k_nrow]){
+        kv.push_back({y-k_nrow/2, x-k_ncol/2, kernel[y+x*k_nrow]});
       }
     }
   }
