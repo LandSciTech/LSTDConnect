@@ -45,34 +45,22 @@ samc_step <- function(steps = 1, cache, population, dead=NULL){
   steps <- as.integer(floor(steps))
   
   sizes <- samc_cache_sizes_cpp(cache)
+  #print(sizes)
   # {ca->nrow, ca->ncol, ca->left_extra_cols, ca->right_extra_cols};
-  s_pop <- NA
-  s_dead <- NA
   
   if(nrow(population) != sizes[1]){
     stop("Population has the wrong height")
-  }else if(ncol(population) == sizes[2]){
-    s_pop <- matrix(0, nrow=sizes[1], ncol=sizes[2]+sizes[3]+sizes[4])
-    
-    s_pop[1:sizes[1], (1+sizes[3]):(sizes[2]+sizes[3])] <- population
-  }else if(ncol(population) == sizes[2]+sizes[3]+sizes[4]){
-    s_pop <- population
-  }else{
+  }else if(ncol(population) != sizes[2]){
     stop("Population has the wrong width")
   }
   
   if(is.null(dead)){
-    s_dead <- matrix(0, nrow=sizes[1], ncol=sizes[2]+sizes[3]+sizes[4])
+    dead <- matrix(0, nrow=sizes[1], ncol=sizes[2])
   }else if(nrow(dead) != sizes[1]){
     stop("Dead has the wrong height")
-  }else if(ncol(dead) == sizes[2]){
-    s_dead <- matrix(0, nrow=sizes[1], ncol=sizes[2]+sizes[3]+sizes[4])
-    s_dead[1:sizes[1], (1+sizes[3]):(sizes[2]+sizes[3])] <- dead
-  }else if(ncol(dead) == sizes[2]+sizes[3]+sizes[4]){
-    s_dead <- dead
-  }else{
+  }else if(ncol(dead) != sizes[2]){
     stop("Dead has the wrong width")
   }
   
-  return(samc_step_cpp(steps, cache, s_pop, s_dead))
+  return(samc_step_cpp(steps, cache, population, dead))
 }

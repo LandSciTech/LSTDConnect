@@ -2,6 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+*.o
+*.so
+*.dll
 LSTDConnectInstall.R
 LSTDConnect.Rproj
 

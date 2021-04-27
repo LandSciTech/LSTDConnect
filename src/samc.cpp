@@ -111,30 +111,34 @@ Rcpp::XPtr<samc::cache> cache_samc(
   return xp;
 }
 
-inline void samc_step(
+inline void samc_one_step(
     const samc::cache& ca,
-    const Rcpp::NumericMatrix& pop_in,
-    const Rcpp::NumericMatrix& dead_in,
-    Rcpp::NumericMatrix& pop_out,
-    Rcpp::NumericMatrix& dead_out){
+    const double* const pop_in,
+    const double* const dead_in,
+    double* const pop_out,
+    double* const dead_out){
   
   //const auto indexes     = std::ranges::iota_view<size_t, size_t>(0, ca.death_rate.size());
   //const auto connections = std::ranges::iota_view<size_t, size_t>(0, ca.kernel_size);
   
-  const std::size_t offset = ca.nrow * ca.left_extra_cols;
+  //const std::size_t offset = ca.nrow * ca.left_extra_cols;
+  
+  const double* const p_in = pop_in;// + (ca.nrow * ca.left_extra_cols);
+  const double* const d_in = dead_in;
+  
+  double* const p_out = pop_out;// + (ca.nrow * ca.left_extra_cols);
+  double* const d_out = dead_out;
   
   //std::cout << ca.death_rate.size() << " " << ca.kernel_size << " " << offset <<"\n";
   #pragma omp parallel for 
   for(std::size_t i = 0; i<ca.death_rate.size(); i++){
-    dead_out[i+offset] = dead_in[i+offset]+ca.death_rate[i]*pop_in[i+offset];
+    d_out[i] = d_in[i]+ca.death_rate[i]*p_in[i];
     double acc = 0;
     for(std::size_t con = 0; con < ca.kernel_size; con++){
       //std::cout << i << "\t" << con << "\t" << i*ca.kernel_size+con << "\t" << i+offset+ca.kernel[con]  <<"\n";
-      //return ca.movement_rate[i][con]*pop_in[i+offset+ca.kernel[con]];
-      acc += ca.movement_rate[i*ca.kernel_size+con]*pop_in[i+offset+ca.kernel[con]];
-      //return 1.0;
+      acc += ca.movement_rate[i*ca.kernel_size+con]*p_in[i+ca.kernel[con]];
     }
-  pop_out[i+offset] = acc;
+    p_out[i] = acc;
   }
 }
 
@@ -154,8 +158,8 @@ void samc_print_cache(const Rcpp::XPtr<samc::cache>& ca){
 Rcpp::List samc_step(
     std::vector<long> steps,
     const Rcpp::XPtr<samc::cache>& ca,
-    Rcpp::NumericMatrix& pop_in,
-    Rcpp::NumericMatrix& dead_in){
+    const Rcpp::NumericMatrix& pop_in,
+    Rcpp::NumericMatrix dead_in){
   
   if(steps.size() <= 1){
     std::cerr << "We need at least one step number\n";
@@ -171,43 +175,49 @@ Rcpp::List samc_step(
     return {};
   }
   
-  Rcpp::NumericMatrix pop_in_b( ca->nrow, (ca->ncol + ca->left_extra_cols + ca->right_extra_cols));
-  Rcpp::NumericMatrix dead_in_b(ca->nrow, (ca->ncol + ca->left_extra_cols + ca->right_extra_cols));
+  std::vector<double> pop_a(ca->nrow*(ca->ncol+ca->left_extra_cols+ca->right_extra_cols), 0.0);
+  std::vector<double> pop_b(ca->nrow*(ca->ncol+ca->left_extra_cols+ca->right_extra_cols), 0.0);
   
-  const Rcpp::NumericMatrix* last_pop_p = &pop_in;
-  const Rcpp::NumericMatrix* last_dead_p = &dead_in;
+  std::memcpy(&pop_a[ca->nrow*ca->left_extra_cols], &pop_in[0], ca->nrow*ca->ncol*sizeof(double));
   
-  Rcpp::NumericMatrix* next_pop_p = &pop_in_b;
-  Rcpp::NumericMatrix* next_dead_p = &dead_in_b;
-  
+  std::vector<double> dead_b(ca->nrow*ca->ncol, 0.0);
   
   std::vector<Rcpp::NumericMatrix> pops{};
   std::vector<Rcpp::NumericMatrix> deads{};
   
-  long last_i = 0;
+  double* const p_a = &pop_a[ca->nrow*ca->left_extra_cols];
+  double* const p_b = &pop_b[ca->nrow*ca->left_extra_cols];
+  double* const d_a = &dead_in[0];
+  double* const d_b = &dead_b[0];
   
-  for(size_t index=0; index<steps.size(); index++){
-    long i = steps[index];
-    for(long j = 0; j<i-last_i; j++){
-      samc_step(*ca, *last_pop_p, *last_dead_p, *next_pop_p, *next_dead_p);
-      last_pop_p = next_pop_p;
-      last_dead_p = next_dead_p;
-      if(next_pop_p == &pop_in_b){
-        next_pop_p = &pop_in;
-        next_dead_p = &dead_in;
+  const double* p_in = p_a;
+  const double* d_in = d_a;
+  double* p_out = p_b;
+  double* d_out = d_b;
+  
+  long last_i = 0;
+  for(long i : steps){
+    for(long j=0; j<i-last_i; j++){
+      //step once
+      samc_one_step(*ca, p_in, d_in, p_out, d_out);
+      
+      p_in = p_out;
+      d_in = d_out;
+      if(p_out == p_a){
+        p_out = p_b;
+        d_out = d_b;
       }else{
-        next_pop_p = &pop_in_b;
-        next_dead_p = &pop_in_b;
+        p_out = p_a;
+        d_out = d_a;
       }
     }
-    last_i = i;
-    if(index+1 < steps.size()){
-      pops.emplace_back(Rcpp::clone(*last_pop_p));
-      deads.emplace_back(Rcpp::clone(*last_dead_p));
-    }else{
-      pops.emplace_back(*last_pop_p);
-      deads.emplace_back(*last_dead_p);
-    }
+    pops.emplace_back(int(ca->nrow), int(ca->ncol));
+    deads.emplace_back(int(ca->nrow), int(ca->ncol));
+    
+    std::memcpy(&pops.back()[0], p_in, ca->nrow*ca->ncol*sizeof(double));
+    std::memcpy(&deads.back()[0], d_in, ca->nrow*ca->ncol*sizeof(double));
+    
+    //add to output lists
   }
   
   return Rcpp::List::create(Rcpp::Named("steps") = steps, Rcpp::Named("population") = pops, Rcpp::Named("deaths") = deads);

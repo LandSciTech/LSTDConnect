@@ -41,15 +41,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // samc_step
-Rcpp::List samc_step(std::vector<long> steps, const Rcpp::XPtr<samc::cache>& ca, Rcpp::NumericMatrix& pop_in, Rcpp::NumericMatrix& dead_in);
+Rcpp::List samc_step(std::vector<long> steps, const Rcpp::XPtr<samc::cache>& ca, const Rcpp::NumericMatrix& pop_in, Rcpp::NumericMatrix dead_in);
 RcppExport SEXP _LSTDConnect_samc_step(SEXP stepsSEXP, SEXP caSEXP, SEXP pop_inSEXP, SEXP dead_inSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< std::vector<long> >::type steps(stepsSEXP);
     Rcpp::traits::input_parameter< const Rcpp::XPtr<samc::cache>& >::type ca(caSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type pop_in(pop_inSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type dead_in(dead_inSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type pop_in(pop_inSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type dead_in(dead_inSEXP);
     rcpp_result_gen = Rcpp::wrap(samc_step(steps, ca, pop_in, dead_in));
     return rcpp_result_gen;
 END_RCPP
