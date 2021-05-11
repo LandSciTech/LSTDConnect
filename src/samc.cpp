@@ -161,7 +161,7 @@ Rcpp::List samc_step(
     const Rcpp::NumericMatrix& pop_in,
     Rcpp::NumericMatrix dead_in){
   
-  if(steps.size() <= 1){
+  if(steps.size() <= 0){
     std::cerr << "We need at least one step number\n";
     return {};
   }
