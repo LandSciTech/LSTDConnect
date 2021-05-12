@@ -16,16 +16,17 @@
 
 namespace samc{
 
+template<bool SYMMETRIC>
 inline void construct_cache(
     cache& ca,
     const std::vector<kernel_point_t>& kernel,
-    const Rcpp::NumericMatrix& permiability,
+    const Rcpp::NumericMatrix& resistance,
     const Rcpp::NumericMatrix& fidelity,
     const Rcpp::NumericMatrix& absorbtion){
 
   ca.kernel_size = kernel.size();
-  ca.nrow = permiability.nrow();
-  ca.ncol = permiability.ncol();
+  ca.nrow = resistance.nrow();
+  ca.ncol = resistance.ncol();
 
   ca.movement_rate.clear();
   ca.movement_rate.resize(ca.kernel_size*ca.nrow*ca.ncol, {0});
@@ -44,11 +45,11 @@ inline void construct_cache(
   ca.left_extra_cols  = std::max((ca.nrow-1-min_offset)/ca.nrow, {0});
   ca.right_extra_cols = std::max((ca.nrow-1+max_offset)/ca.nrow, {0});
 
-  //#pragma omp parallel for
+  #pragma omp parallel for
   for(std::size_t x = 0; x<ca.ncol; x++){
     for(std::size_t y = 0; y<ca.nrow; y++){
       //std::cout << x << ", " << y << ", " << ca.death_rate[y+x*ca.nrow] << "\n";
-      //bool printing = true;//x==3 && y==3;
+      //bool printing = x==1 && y==1;
 
       double weighted_sum = 0;
 
@@ -58,8 +59,8 @@ inline void construct_cache(
         const std::size_t k_y = y+k_point.y_off;
 
         if((k_x >= 0 && k_x < ca.ncol) && (k_y >= 0 && k_y < ca.nrow)){
-          weighted_sum += permiability[k_y + k_x*ca.nrow] * k_point.num;
-          //if(printing) std::cout << "a:" << x << ", " << y << ", " <<  k_x << ", " <<  k_y << ", " <<  permiability[k_y + k_x*ca.nrow] << ", " <<  k_point.num << "\n";
+          weighted_sum += k_point.num/(resistance[k_y + k_x*ca.nrow]+(SYMMETRIC*resistance[y + x*ca.nrow]));
+          //if(printing) std::cout << "a:" << x << ", " << y << ", " <<  k_x << ", " <<  k_y << ", " <<  resistance[k_y + k_x*ca.nrow] << ", " <<  k_point.num << "\n";
         }
       }
       double t_scalar = 0;
@@ -85,7 +86,7 @@ inline void construct_cache(
         const std::size_t k_y = y+k_point.y_off;
 
         if((k_x >= 0 && k_x < ca.ncol) && (k_y >= 0 && k_y < ca.nrow)){
-          ca.movement_rate[k+(k_y+k_x*ca.nrow)*ca.kernel_size] = l_scalar * permiability[k_y + k_x*ca.nrow] * k_point.num + (k_point.x_off == 0 && k_point.y_off == 0)*l_fidelity;
+          ca.movement_rate[k+(k_y+k_x*ca.nrow)*ca.kernel_size] = (l_scalar * k_point.num)/(resistance[k_y + k_x*ca.nrow]+(SYMMETRIC*resistance[y + x*ca.nrow])) + (k_point.x_off == 0 && k_point.y_off == 0)*l_fidelity;
 
           //if(printing) std::cout << "c:" << k_x << ", " <<  k_y << ", " <<  ca.movement_rate[k+(k_y+k_x*ca.nrow)*ca.kernel_size] << "\n";
         }
@@ -102,9 +103,10 @@ inline void construct_cache(
 // [[Rcpp::export(cache_samc_cpp)]]
 Rcpp::XPtr<samc::cache> cache_samc(
     const Rcpp::NumericMatrix& kernel,
-    const Rcpp::NumericMatrix& permeability,
+    const Rcpp::NumericMatrix& resistance,
     const Rcpp::NumericMatrix& fidelity,
-    const Rcpp::NumericMatrix& absorbtion){
+    const Rcpp::NumericMatrix& absorbtion,
+    const bool symmetric){
 
   std::vector<samc::kernel_point_t> kv{};
 
@@ -127,7 +129,11 @@ Rcpp::XPtr<samc::cache> cache_samc(
   //}
 
   samc::cache* ca = new samc::cache;
-  samc::construct_cache(*ca, kv, permeability, fidelity, absorbtion);
+  if(symmetric){
+    samc::construct_cache<true>(*ca, kv, resistance, fidelity, absorbtion);
+  }else{
+    samc::construct_cache<false>(*ca, kv, resistance, fidelity, absorbtion);
+  }
   Rcpp::XPtr<samc::cache> xp(ca, true);
   /*
   std::cout << "{"
@@ -177,6 +183,18 @@ inline void samc_one_step(
       acc += ca.movement_rate[i*ca.kernel_size+con]*p_in[i+ca.kernel[con]];
     }
     p_out[i] = acc;
+  }
+}
+
+// [[Rcpp::export(samc_print_cache_as_matrix)]]
+void samc_print_cache_as_matrix(const Rcpp::XPtr<samc::cache>& ca){
+  const samc::cache& c = *ca;
+  std::cout << "[";
+  for(size_t i = 0; i<c.nrow; i++){
+    std::cout << "[";
+    for(size_t j = 0; j<c.ncol; j++){
+
+    }
   }
 }
 

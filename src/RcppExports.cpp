@@ -7,17 +7,28 @@
 using namespace Rcpp;
 
 // cache_samc
-Rcpp::XPtr<samc::cache> cache_samc(const Rcpp::NumericMatrix& kernel, const Rcpp::NumericMatrix& permeability, const Rcpp::NumericMatrix& fidelity, const Rcpp::NumericMatrix& absorbtion);
-RcppExport SEXP _LSTDConnect_cache_samc(SEXP kernelSEXP, SEXP permeabilitySEXP, SEXP fidelitySEXP, SEXP absorbtionSEXP) {
+Rcpp::XPtr<samc::cache> cache_samc(const Rcpp::NumericMatrix& kernel, const Rcpp::NumericMatrix& resistance, const Rcpp::NumericMatrix& fidelity, const Rcpp::NumericMatrix& absorbtion, const bool symmetric);
+RcppExport SEXP _LSTDConnect_cache_samc(SEXP kernelSEXP, SEXP resistanceSEXP, SEXP fidelitySEXP, SEXP absorbtionSEXP, SEXP symmetricSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type kernel(kernelSEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type permeability(permeabilitySEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type resistance(resistanceSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type fidelity(fidelitySEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type absorbtion(absorbtionSEXP);
-    rcpp_result_gen = Rcpp::wrap(cache_samc(kernel, permeability, fidelity, absorbtion));
+    Rcpp::traits::input_parameter< const bool >::type symmetric(symmetricSEXP);
+    rcpp_result_gen = Rcpp::wrap(cache_samc(kernel, resistance, fidelity, absorbtion, symmetric));
     return rcpp_result_gen;
+END_RCPP
+}
+// samc_print_cache_as_matrix
+void samc_print_cache_as_matrix(const Rcpp::XPtr<samc::cache>& ca);
+RcppExport SEXP _LSTDConnect_samc_print_cache_as_matrix(SEXP caSEXP) {
+BEGIN_RCPP
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Rcpp::XPtr<samc::cache>& >::type ca(caSEXP);
+    samc_print_cache_as_matrix(ca);
+    return R_NilValue;
 END_RCPP
 }
 // samc_cache_sizes
@@ -47,7 +58,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_LSTDConnect_cache_samc", (DL_FUNC) &_LSTDConnect_cache_samc, 4},
+    {"_LSTDConnect_cache_samc", (DL_FUNC) &_LSTDConnect_cache_samc, 5},
+    {"_LSTDConnect_samc_print_cache_as_matrix", (DL_FUNC) &_LSTDConnect_samc_print_cache_as_matrix, 1},
     {"_LSTDConnect_samc_cache_sizes", (DL_FUNC) &_LSTDConnect_samc_cache_sizes, 1},
     {"_LSTDConnect_samc_step", (DL_FUNC) &_LSTDConnect_samc_step, 4},
     {NULL, NULL, 0}

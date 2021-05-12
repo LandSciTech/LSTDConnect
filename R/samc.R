@@ -3,12 +3,24 @@
 #' @importFrom Rcpp evalCpp
 
 
+.compare_implementations <- function(t, resistance, fidelity, absorbtion, population, kernel=8){
+  
+  samc_obj <- samc(resistance, absorbtion, fidelity, tr_fun = function(x) 1/mean(x), override=TRUE, directions=kernel)
+  
+  acc = matrix(0, nrow(population), ncol(population))
+  
+  for(i in 1:length(population)){
+    acc = acc + population[i]*matrix(distribution(samc_obj, origin = i, time=t), nrow(population), ncol(population), byrow = TRUE)
+  }
+  
+  return(acc - samc_step(t, samc_cache(resistance, fidelity, absorbtion, kernel), population)[["population"]][[1]])
+}
+
 #' @export
-samc_cache <- function(permiability, absorbtion=NULL, fidelity=NULL, kernel=8, permiability_na_mask = 0, absorbtion_na_mask = 0, fidelity_na_mask = 0){
+samc_cache <- function(resistance, fidelity=NULL, absorbtion=NULL, kernel=8, resistance_na_mask = 0, absorbtion_na_mask = 0, fidelity_na_mask = 0, symmetric=TRUE){
   
-  
-  if(!is.numeric(permiability) || !is.matrix(permiability)){
-    stop("permiability must be a numeric matrix")
+  if(!is.numeric(resistance) || !is.matrix(resistance)){
+    stop("resistance must be a numeric matrix")
   }
   
   if(!is.numeric(kernel)){
@@ -32,34 +44,38 @@ samc_cache <- function(permiability, absorbtion=NULL, fidelity=NULL, kernel=8, p
   }
   
   if(is.null(absorbtion)){
-    absorbtion <- matrix(0, nrow(permiability), ncol(permiability))
+    absorbtion <- matrix(0, nrow(resistance), ncol(resistance))
   }else if(is.numeric(absorbtion) && !is.matrix(absorbtion)){
-    absorbtion <- matrix(absorbtion, nrow(permiability), ncol(permiability))
+    absorbtion <- matrix(absorbtion, nrow(resistance), ncol(resistance))
   }else if(!is.numeric(absorbtion) || !is.matrix(absorbtion)){
-    stop("absorbtion must be a numeric matrix of the same dimentions as permiability, or a numeric to be used to create such a matrix, or null to default to no absorbtion")
+    stop("absorbtion must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no absorbtion")
   }
   
-  if(!all(dim(permiability) == dim(absorbtion))){
-    stop("If absorbtion is a matrix, it must be of the same dimentions as permiability.")
+  if(!all(dim(resistance) == dim(absorbtion))){
+    stop("If absorbtion is a matrix, it must be of the same dimentions as resistance")
   }
   
   if(is.null(fidelity)){
-    fidelity <- matrix(0, nrow(permiability), ncol(permiability))
+    fidelity <- matrix(0, nrow(resistance), ncol(resistance))
   
   }else if(is.numeric(fidelity) && !is.matrix(fidelity)){
-    fidelity <- matrix(fidelity, nrow(permiability), ncol(permiability))
+    fidelity <- matrix(fidelity, nrow(resistance), ncol(resistance))
     
   }else if(!is.numeric(fidelity) || !is.matrix(fidelity)){
-    stop("fidelity must be a numeric matrix of the same dimentions as permiability, or a numeric to be used to create such a matrix, or null to default to no fidelity")
+    stop("fidelity must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no fidelity")
   }
   
-  if(!all(dim(permiability) == dim(fidelity))){
-    stop("If fidelity is a matrix, it must be of the same dimentions as permiability.")
+  if(!all(dim(resistance) == dim(fidelity))){
+    stop("If fidelity is a matrix, it must be of the same dimentions as resistance")
   }
   
-  permiability[!is.finite(permiability)] <- permiability_na_mask
-  absorbtion[  !is.finite(absorbtion)]   <- absorbtion_na_mask
-  fidelity[    !is.finite(fidelity)]     <- fidelity_na_mask
+  resistance[!is.finite(resistance)] <- resistance_na_mask
+  absorbtion[!is.finite(absorbtion)] <- absorbtion_na_mask
+  fidelity[  !is.finite(fidelity)]   <- fidelity_na_mask
+  
+  if(any(0 > resistance)){
+    stop("resistance must > 0")
+  }
   
   if(any(0 > absorbtion || absorbtion > 1)){
     stop("absorbtion must be in the range [0,1]")
@@ -73,7 +89,7 @@ samc_cache <- function(permiability, absorbtion=NULL, fidelity=NULL, kernel=8, p
     stop("fidelity+absorbtion must be <= 1")
   }
   
-  return(cache_samc_cpp(kernel, permiability, fidelity, absorbtion))
+  return(cache_samc_cpp(kernel, resistance, fidelity, absorbtion, symmetric))
 }
 
 
