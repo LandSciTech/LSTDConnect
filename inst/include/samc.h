@@ -21,8 +21,8 @@ struct cache{
   std::size_t kernel_size;
   std::size_t left_extra_cols;
   std::size_t right_extra_cols;
-  std::vector<double> movement_rate; /* size should be ncol*nrow*kernel_size */
-  std::vector<double> death_rate; /* size should be ncol*nrow */
+  std::vector<double> movement_rate;  /* size should be ncol*nrow*kernel_size */
+  std::vector<double> absorbtion;     /* size should be ncol*nrow or empty*/
   std::vector<std::ptrdiff_t> kernel; /* a list of offsets from a given point to all of the places that it needs to look in the list of points */
 
 };
@@ -41,10 +41,10 @@ inline std::ostream &operator << (std::ostream &os, const cache &ca) {
     if(first){first = false;}else{os << ", ";}
     os << off;
   }
-  os << "], \"death_rate\":[";
+  os << "], \"absorbtion\":[";
 
   first = true;
-  for(auto death : ca.death_rate){
+  for(auto death : ca.absorbtion){
     if(first){first = false;}else{os << ", ";}
     os << death;
   }
