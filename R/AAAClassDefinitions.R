@@ -11,8 +11,6 @@ setClassUnion("listOrNumeric", c("list", "numeric"))
 #'
 #' PARC-Connectedness analysis information including distance d_ij matrix, habitat value H_j vector, metric M_i RasterBrick or list of vectors, data frame average metric of each patch Mbar_p, data frame average metric of all patches Mbar.
 #'
-#' @details
-#'
 #' @examples
 #' #TO DO - examples
 #'
