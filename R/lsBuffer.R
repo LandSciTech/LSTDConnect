@@ -41,7 +41,7 @@ setMethod("lsBuffer", signature(x = "RasterLayer"),
   x[!eval(subset)] <- 0 # TO DO test this.
   if (length(raster::unique(x)) > 0) {
     if (width > 0) {
-      weights <- uniformKernel(width, res(x)[1])
+      weights <- uniformKernel(width, raster::res(x)[1])
 
       vx <- velox::velox(x)
       vx$sumFocal(weights = weights, bands = c(1))

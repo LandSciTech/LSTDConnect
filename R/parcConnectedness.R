@@ -131,7 +131,7 @@ setMethod("parcConnectedness", signature(x = "ParcConnectedness"),
       cName <- paste0("alpha", ca)
       cName <- gsub("-", ".", cName, fixed = T)
       
-      # scaleKernel = exponentialKernel(2/ca,cellDim=res(x@patches)[1],
+      # scaleKernel = exponentialKernel(2/ca,cellDim=raster::res(x@patches)[1],
       #                                 returnScale=T,negligible=10^-6)#put in the vicinity of 1
       # Exponential kernel from Hughes et al 2015 American Naturalist
       # w_ij =(2/(pi*(1/ca)^2))* exp(-ca*x@d_ij[[cl]])
@@ -163,7 +163,7 @@ setMethod("parcConnectedness", signature(x = "ParcConnectedness"),
       #########
       # Convert R_iv vector to map
       R_ivd <- data.frame(id = as.numeric(names(R_iv)), R = R_iv)
-      R_ivd <- merge(data.frame(id = 1:ncell(x@patches)), R_ivd, all.x = T)
+      R_ivd <- merge(data.frame(id = 1:raster::ncell(x@patches)), R_ivd, all.x = T)
       tempM <- blankMap
       tempM[] <- R_ivd$R
       
@@ -194,7 +194,7 @@ setMethod("parcConnectedness", signature(x = "ParcConnectedness"),
 setMethod("parcConnectedness", signature(x = "RasterStack"), 
           function(x, habitatValue, distanceMethod, maxDist, alpha, metric, 
                    region, memoryLimit, stopOnMemoryLimit, neighbourhood) {
-  # x=stack(fPatch,exCost,qSurface);distanceMethod="leastCostPaths";maxDist=maxDistHold*res(qSurface)[1];alpha=2/(dbar*res(qSurface)[1]);region=NULL;memoryLimit=0;metric="connectivity";stopOnMemoryLimit=F;neighbourhood="octagon"
+  # x=stack(fPatch,exCost,qSurface);distanceMethod="leastCostPaths";maxDist=maxDistHold*raster::res(qSurface)[1];alpha=2/(dbar*raster::res(qSurface)[1]);region=NULL;memoryLimit=0;metric="connectivity";stopOnMemoryLimit=F;neighbourhood="octagon"
   # x=exDat;distanceMethod="leastCostPaths";maxDist=25;alpha=5;region=NULL;memoryLimit=0;metric="colonization potential"
   # x=stack(testPatch,oneMap,exQuality);neighbourhood="octagon";distanceMethod="leastCostPaths";maxDist=nrow(exponentialKernel(dbar,negligible=10^-6));alpha=2/dbar;memoryLimit=0;stopOnMemoryLimit=T
   names(x) <- c("patches", "cost", "habitatValue")
@@ -211,7 +211,7 @@ setMethod("parcConnectedness", signature(x = "RasterStack"),
   x <- raster::dropLayer(x, "patches")
   patches[!region] <- NA
   
-  isPatches <- cellStats(patches, "sum")
+  isPatches <- raster::cellStats(patches, "sum")
   if (isPatches == 0) {
     stop("There are no patches for parc calculation A.")
   }
@@ -233,16 +233,16 @@ setMethod("parcConnectedness", signature(x = "RasterStack"),
   # plot(x$habitatValue)
   # x$habitatValue[!is.na(buffClumps)]=100
   # plot(buffClumps)
-  #  cellStats(buffClumps,stat="sum")
-  #  cellStats(patches,stat="sum")
-  # cellStats(patches&!is.na(x$habitatValue),stat="sum")
+  # raster::cellStats(buffClumps,stat="sum")
+  # raster::cellStats(patches,stat="sum")
+  # raster::cellStats(patches&!is.na(x$habitatValue),stat="sum")
   for (ic in clumps) {
     # ic=clumps[1]
     
     cPatches <- patches
     cPatches[buffClumps != ic] <- NA
     cPatches[is.na(buffClumps)] <- NA
-    isPatches <- cellStats(cPatches, "sum")
+    isPatches <- raster::cellStats(cPatches, "sum")
     if (isPatches == 0) {
       stop("There are no patches for parc calculation B.")
     }

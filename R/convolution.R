@@ -61,7 +61,7 @@ setMethod("applyKernel", signature(quality = "RasterLayer"),
       stop("kernel shape ", kernel, " not recognized. Options are:", 
            paste(kernelTypes, collapse = ","))
     }
-    cellDim <- res(quality)[1]
+    cellDim <- raster::res(quality)[1]
     dbar <- d / cellDim
     
     if (kernel == "Exponential") {
@@ -77,7 +77,7 @@ setMethod("applyKernel", signature(quality = "RasterLayer"),
     kShape[kShape != 0] <- 1
     dvec <- as.vector(k)
     centrePt <- ceiling(length(dvec) / 2) # NOTE: this only works for symmetric kernels
-    trMap <- focal(quality, kShape, fun = function(x) {
+    trMap <- raster::focal(quality, kShape, fun = function(x) {
       qprime(x, centrePt, dvec, z)
     }, pad = FALSE)
     # TO DO: testing qprime
@@ -97,7 +97,7 @@ setMethod("applyKernel", signature(quality = "RasterLayer"),
       trTemp <- spatialfil::applyFilter(mTemp, temp)
       trTemp <- raster::raster(trTemp)
       trMap <- quality
-      values(trMap) <- values(trTemp)
+      raster::values(trMap) <- raster::values(trTemp)
     }
     if (convolutionMethod == "velox") {
       # TO DO: stop if velox not loaded.
@@ -109,9 +109,9 @@ setMethod("applyKernel", signature(quality = "RasterLayer"),
       # kShape=k
       # kShape[kShape!=0] = 1
       # dvec <- as.vector(k)
-      # trMap <- focal(quality, kShape, fun= function(x){focalConvolve(x,dvec)}, pad=FALSE)
+      # trMap <- raster::focal(quality, kShape, fun= function(x){focalConvolve(x,dvec)}, pad=FALSE)
       quality[is.na(quality)] <- 0
-      trMap <- focal(quality, k, fun = sum, pad = FALSE)
+      trMap <- raster::focal(quality, k, fun = sum, pad = FALSE)
       # TO DO: figure out what to do about PAD argument.
     }
   }

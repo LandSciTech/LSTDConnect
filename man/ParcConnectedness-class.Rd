@@ -6,7 +6,10 @@
 \alias{ParcConnectedness}
 \title{ParcConnectedness}
 \description{
-PARC-Connectedness analysis information including distance d_ij matrix, habitat value H_j vector, metric M_i RasterBrick or list of vectors, data frame average metric of each patch Mbar_p, data frame average metric of all patches Mbar.
+PARC-Connectedness analysis information including distance d_ij matrix, 
+habitat value H_j vector, metric M_i RasterBrick or list of vectors, data 
+frame average metric of each patch Mbar_p, data frame average metric of all 
+patches Mbar.
 }
 \section{Slots}{
 
@@ -15,18 +18,20 @@ PARC-Connectedness analysis information including distance d_ij matrix, habitat 
 
 \item{\code{d_ij}}{matrix or list of these. Effective distances among locations.}
 
-\item{\code{H_j}}{vector or list of these. Vector of H_j values. Indices must correspond to rows(?) of d_ij matrix.}
+\item{\code{H_j}}{vector or list of these. Vector of H_j values. Indices must 
+correspond to rows(?) of d_ij matrix.}
 
 \item{\code{M_i}}{RasterBrick or list of vectors. Element names are alpha values.}
 
-\item{\code{Mbar_p}}{data.frame. Average metric value for each alpha and each stratum (or patch id) in patches layer.}
+\item{\code{Mbar_p}}{data.frame. Average metric value for each alpha and each stratum 
+(or patch id) in patches layer.}
 
 \item{\code{Mbar}}{data.frame. Average metric for each alpha across all patches.}
 
-\item{\code{metric}}{character. Metric type.Options are "connectivity" or "colonization potential" (equations 3 or 4 of Drielsma)}
+\item{\code{metric}}{character. Metric type.Options are "connectivity" or "colonization 
+potential" (equations 3 or 4 of Drielsma)}
 }}
 
 \examples{
-#TO DO - examples
-
+# TO DO - examples
 }

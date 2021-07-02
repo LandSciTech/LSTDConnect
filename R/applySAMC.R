@@ -71,8 +71,8 @@ setMethod("applySAMC", signature(occurrence = "matrix"),
     samcObj <- samc::samc(resistance, absorption, tr_fun = function(x) 1 / mean(x))
   }
   if (!is.null(d)) {
-    stop("TO DO: create & use lookup table to find t that most closely corresponds to selected dbar.")
-    cellDim <- res(quality)[1]
+    stop("TO DO: create & use lookup table to find t that most closely corraster::responds to selected dbar.")
+    cellDim <- raster::res(quality)[1]
     dbar <- d / cellDim
     # TO DO: create & use lookup table to find t that most closely corresponds to selected dbar.
   }
