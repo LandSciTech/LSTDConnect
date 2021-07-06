@@ -5,10 +5,6 @@ cache_samc_cpp <- function(kernel, resistance, fidelity, absorbtion, symmetric) 
     .Call('_LSTDConnect_cache_samc', PACKAGE = 'LSTDConnect', kernel, resistance, fidelity, absorbtion, symmetric)
 }
 
-samc_print_cache_as_matrix <- function(ca) {
-    invisible(.Call('_LSTDConnect_samc_print_cache_as_matrix', PACKAGE = 'LSTDConnect', ca))
-}
-
 samc_cache_sizes_cpp <- function(ca) {
     .Call('_LSTDConnect_samc_cache_sizes', PACKAGE = 'LSTDConnect', ca)
 }

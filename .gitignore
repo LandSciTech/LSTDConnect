@@ -2,9 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
+LSTDConnectInstall.R
+LSTDConnect.Rproj
+nonVersionedInput
+output
 *.o
 *.so
 *.dll
-LSTDConnectInstall.R
-LSTDConnect.Rproj
-
