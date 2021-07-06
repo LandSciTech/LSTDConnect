@@ -25,6 +25,7 @@ Imports:
     data.table,
     igraph,
     samc,
+    methods,
     Rcpp
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1

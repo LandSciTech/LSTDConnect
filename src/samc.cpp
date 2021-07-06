@@ -44,11 +44,12 @@ inline void construct_cache(
 
   ca.left_extra_cols  = std::max((ca.nrow-1-min_offset)/ca.nrow, {0});
   ca.right_extra_cols = std::max((ca.nrow-1+max_offset)/ca.nrow, {0});
-
+#ifdef _OPENMP
   #pragma omp parallel for
+#endif
   for(std::size_t x = 0; x<ca.ncol; x++){
     for(std::size_t y = 0; y<ca.nrow; y++){
-      //std::cout << x << ", " << y << ", " << ca.death_rate[y+x*ca.nrow] << "\n";
+      //Rcpp::Rcout << x << ", " << y << ", " << ca.death_rate[y+x*ca.nrow] << "\n";
       //bool printing = x==1 && y==1;
 
       double weighted_sum = 0;
@@ -60,7 +61,7 @@ inline void construct_cache(
 
         if((k_x >= 0 && k_x < ca.ncol) && (k_y >= 0 && k_y < ca.nrow)){
           weighted_sum += k_point.num/(resistance[k_y + k_x*ca.nrow]+(SYMMETRIC*resistance[y + x*ca.nrow]));
-          //if(printing) std::cout << "a:" << x << ", " << y << ", " <<  k_x << ", " <<  k_y << ", " <<  resistance[k_y + k_x*ca.nrow] << ", " <<  k_point.num << "\n";
+          //if(printing) Rcpp::Rcout << "a:" << x << ", " << y << ", " <<  k_x << ", " <<  k_y << ", " <<  resistance[k_y + k_x*ca.nrow] << ", " <<  k_point.num << "\n";
         }
       }
       double t_scalar = 0;
@@ -76,9 +77,9 @@ inline void construct_cache(
       const double l_scalar     = t_scalar;
       const double l_fidelity   = t_fidelity;
 
-      //if(printing) std::cout << "b:" << weighted_sum << ", " << l_scalar << ", " << l_fidelity << ", " << t_absorbtion << "\n";
+      //if(printing) Rcpp::Rcout << "b:" << weighted_sum << ", " << l_scalar << ", " << l_fidelity << ", " << t_absorbtion << "\n";
 
-      //std::cout << "(" << x << "," << y << "," << scalar << ")\n";
+      //Rcpp::Rcout << "(" << x << "," << y << "," << scalar << ")\n";
       //can be simd
       for(std::size_t k = 0; k < ca.kernel_size; k++){
         const auto& k_point = kernel[k];
@@ -88,7 +89,7 @@ inline void construct_cache(
         if((k_x >= 0 && k_x < ca.ncol) && (k_y >= 0 && k_y < ca.nrow)){
           ca.movement_rate[k+(k_y+k_x*ca.nrow)*ca.kernel_size] = (l_scalar * k_point.num)/(resistance[k_y + k_x*ca.nrow]+(SYMMETRIC*resistance[y + x*ca.nrow])) + (k_point.x_off == 0 && k_point.y_off == 0)*l_fidelity;
 
-          //if(printing) std::cout << "c:" << k_x << ", " <<  k_y << ", " <<  ca.movement_rate[k+(k_y+k_x*ca.nrow)*ca.kernel_size] << "\n";
+          //if(printing) Rcpp::Rcout << "c:" << k_x << ", " <<  k_y << ", " <<  ca.movement_rate[k+(k_y+k_x*ca.nrow)*ca.kernel_size] << "\n";
         }
         //if no, leave it 0, 0 is the default value anyway
       }
@@ -117,7 +118,7 @@ Rcpp::XPtr<samc::cache> cache_samc(
     for(std::ptrdiff_t x=0; x<k_ncol; x++){
       if(kernel[y+x*k_nrow] || (y-k_nrow/2 == 0 && x-k_ncol/2 == 0)){
         kv.push_back({y-k_nrow/2, x-k_ncol/2, kernel[y+x*k_nrow]});
-        //std::cout << kernel[y+x*k_nrow] << "\n";
+        //Rcpp::Rcout << kernel[y+x*k_nrow] << "\n";
       }
     }
   }
@@ -125,7 +126,7 @@ Rcpp::XPtr<samc::cache> cache_samc(
   if(kv.size() == 0){kv.push_back({0,0,0.0});}
 
   //for(size_t i = 0; i<kv.size(); i++){
-  //  std::cout << i << ", " << kv[i].x_off << ", " << kv[i].y_off << ", " << kv[i].num << "\n";
+  //  Rcpp::Rcout << i << ", " << kv[i].x_off << ", " << kv[i].y_off << ", " << kv[i].num << "\n";
   //}
 
   samc::cache* ca = new samc::cache;
@@ -136,22 +137,22 @@ Rcpp::XPtr<samc::cache> cache_samc(
   }
   Rcpp::XPtr<samc::cache> xp(ca, true);
   /*
-  std::cout << "{"
+  Rcpp::Rcout << "{"
   for(size_t x = 0; x<ca->ncol; x++){
     for(size_t y = 0; y<ca->nrow; y++){
       size_t i = y+x*ca->nrow;
-      std::cout << "{\"x\": " << x << ", \"y\": " << y << ", \"absorbtion\": " << ca->absorbtion[i] << ", \"movement_rate\": [";
+      Rcpp::Rcout << "{\"x\": " << x << ", \"y\": " << y << ", \"absorbtion\": " << ca->absorbtion[i] << ", \"movement_rate\": [";
       bool first = true;
       for(size_t j = 0; j<ca->kernel_size; j++){
         if(first){first = false;}else{
-          std::cout << ", ";
+          Rcpp::Rcout << ", ";
         }
-        std::cout << ca->movement_rate[j+i*ca->kernel_size];
+        Rcpp::Rcout << ca->movement_rate[j+i*ca->kernel_size];
       }
-      std::cout << "]},\n";
+      Rcpp::Rcout << "]},\n";
     }
   }*/
-  //std::cout << *ca << '\n';
+  //Rcpp::Rcout << *ca << '\n';
   return xp;
 }
 
@@ -173,30 +174,32 @@ inline void samc_one_step(
   double* const p_out = pop_out;// + (ca.nrow * ca.left_extra_cols);
   double* const d_out = dead_out;
 
-  //std::cout << ca.death_rate.size() << " " << ca.kernel_size << " " << offset <<"\n";
-  //#pragma omp parallel for
+  //Rcpp::Rcout << ca.death_rate.size() << " " << ca.kernel_size << " " << offset <<"\n";
+#ifdef _OPENMP
+  #pragma omp parallel for
+#endif
   for(std::size_t i = 0; i<ca.absorbtion.size(); i++){
     d_out[i] = d_in[i]+ca.absorbtion[i]*p_in[i];
     double acc = 0;
     for(std::size_t con = 0; con < ca.kernel_size; con++){
-      //std::cout << i << ", " << i%ca.nrow << ", " << i/ca.nrow << ", " << con << ", " << i*ca.kernel_size+con << ", " << i+ca.kernel[con] << ", " << ca.movement_rate[i*ca.kernel_size+con] << '\n';
+      //Rcpp::Rcout << i << ", " << i%ca.nrow << ", " << i/ca.nrow << ", " << con << ", " << i*ca.kernel_size+con << ", " << i+ca.kernel[con] << ", " << ca.movement_rate[i*ca.kernel_size+con] << '\n';
       acc += ca.movement_rate[i*ca.kernel_size+con]*p_in[i+ca.kernel[con]];
     }
     p_out[i] = acc;
   }
 }
-
+/*
 // [[Rcpp::export(samc_print_cache_as_matrix)]]
 void samc_print_cache_as_matrix(const Rcpp::XPtr<samc::cache>& ca){
   const samc::cache& c = *ca;
-  std::cout << "[";
+  Rcpp::Rcout << "[";
   for(size_t i = 0; i<c.nrow; i++){
-    std::cout << "[";
+    Rcpp::Rcout << "[";
     for(size_t j = 0; j<c.ncol; j++){
-
+        //sorry, I ran out of time, good luck
     }
   }
-}
+}*/
 
 // [[Rcpp::export(samc_cache_sizes_cpp)]]
 std::vector<size_t> samc_cache_sizes(const Rcpp::XPtr<samc::cache>& ca){
@@ -211,7 +214,7 @@ Rcpp::List samc_step(
     Rcpp::NumericMatrix dead_in){
 
   if(steps.size() <= 0){
-    std::cerr << "We need at least one step number\n";
+    Rcpp::Rcerr << "We need at least one step number\n";
     return {};
   }
 
@@ -220,7 +223,7 @@ Rcpp::List samc_step(
   //steps is now a serted list of step numbers with no duplicates
 
   if(steps[0] < 0){
-    std::cerr << "We cannot step backwards, all step numbers must be at least 0\n";
+    Rcpp::Rcerr << "We cannot step backwards, all step numbers must be at least 0\n";
     return {};
   }
 

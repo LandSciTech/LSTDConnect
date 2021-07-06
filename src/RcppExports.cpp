@@ -21,16 +21,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// samc_print_cache_as_matrix
-void samc_print_cache_as_matrix(const Rcpp::XPtr<samc::cache>& ca);
-RcppExport SEXP _LSTDConnect_samc_print_cache_as_matrix(SEXP caSEXP) {
-BEGIN_RCPP
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Rcpp::XPtr<samc::cache>& >::type ca(caSEXP);
-    samc_print_cache_as_matrix(ca);
-    return R_NilValue;
-END_RCPP
-}
 // samc_cache_sizes
 std::vector<size_t> samc_cache_sizes(const Rcpp::XPtr<samc::cache>& ca);
 RcppExport SEXP _LSTDConnect_samc_cache_sizes(SEXP caSEXP) {
@@ -59,7 +49,6 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_LSTDConnect_cache_samc", (DL_FUNC) &_LSTDConnect_cache_samc, 5},
-    {"_LSTDConnect_samc_print_cache_as_matrix", (DL_FUNC) &_LSTDConnect_samc_print_cache_as_matrix, 1},
     {"_LSTDConnect_samc_cache_sizes", (DL_FUNC) &_LSTDConnect_samc_cache_sizes, 1},
     {"_LSTDConnect_samc_step", (DL_FUNC) &_LSTDConnect_samc_step, 4},
     {NULL, NULL, 0}
