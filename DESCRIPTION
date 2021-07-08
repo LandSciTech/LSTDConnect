@@ -37,3 +37,7 @@ Suggests:
     testthat,
     spatialfil,
     velox
+Remotes:
+    github::nickwing/spatialfil
+    github::hunzikp/velox
+    
