@@ -38,6 +38,6 @@ Suggests:
     spatialfil,
     velox
 Remotes:
-    github::nickwing/spatialfil
+    github::nickwing/spatialfil,
     github::hunzikp/velox
     
