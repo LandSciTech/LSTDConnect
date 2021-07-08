@@ -39,29 +39,36 @@ applySAMC(
 \arguments{
 \item{occurrence}{RasterLayer or matrix. Initial disperser distribution.}
 
-\item{absorption}{RasterLayer or matrix. Mortality should be between 0 and 1. Optional if samcObj is specified.}
+\item{absorption}{RasterLayer or matrix. Mortality should be between 0 and 1. 
+Optional if samcObj is specified.}
 
-\item{resistance}{RasterLayer or matrix. Resistance should be greater than 0. Optional if samcObj is specified.}
+\item{resistance}{RasterLayer or matrix. Resistance should be greater than 0. 
+Optional if samcObj is specified.}
 
 \item{t}{Numeric. Number of timesteps. Only one of t and d should be specified.}
 
-\item{d}{Numeric. Mean displacement given resistance of 1. In the units of occurrence.}
+\item{d}{Numeric. Mean displacement given resistance of 1. In the units of 
+occurrence.}
 
 \item{patches}{RasterLayer. Optional. Used to mask return layer if provided.}
 
-\item{samcObj}{samc object. Optional. If supplied occurrence and absorption arguments will be ingored. Use to increase computational efficiency if interested in results for more than one occurrence layer or t/d with same resistance and absorption parameters.}
+\item{samcObj}{samc object. Optional. If supplied occurrence and absorption 
+arguments will be ingored. Use to increase computational efficiency if 
+interested in results for more than one occurrence layer or t/d with same 
+resistance and absorption parameters.}
 }
 \value{
-A disperser distribution RasterLayer or matrix. If occurrence is a RasterLayer, the returned disperser distribution will also be a RasterLayer.
-
-A disperser distribution RasterLayer or matrix. If occurrence is a RasterLayer, the returned disperser distribution will also be a RasterLayer.
+A disperser distribution RasterLayer or matrix. If occurrence is a RasterLayer, 
+the returned disperser distribution will also be a RasterLayer.
 }
 \description{
 SAMC disperser distribution
 }
 \details{
-A wrapper around distribution function of samc R package. Allows users to specify a mean displacement distance rather than a time.
+A wrapper around distribution function of samc R package. Allows users to 
+specify a mean displacement distance rather than a time.
 }
 \examples{
 # TODO: examples
+
 }

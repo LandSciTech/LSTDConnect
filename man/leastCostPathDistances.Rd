@@ -28,9 +28,13 @@ leastCostPathDistances(
 
 \item{maxDist}{Numeric. Maximum distance between i and j in map units.}
 
-\item{bufferedPatches}{RasterLayer. Optional. If provided maxDist will be ignored. bufferedPatches defines the calculation region - use to restrict calculations to a portion of the map area.}
+\item{bufferedPatches}{RasterLayer. Optional. If provided maxDist will be 
+ignored. bufferedPatches defines the calculation region - use to restrict 
+calculations to a portion of the map area.}
 
-\item{neighbourhood}{Character. 'rook','queen', or 'octagon'. 'octagon' option is a modified version of the queen's 8 cell neighbourhood in which diagonals weights are 2^0.5x higher than horizontal/vertical weights.}
+\item{neighbourhood}{Character. 'rook','queen', or 'octagon'. 'octagon' 
+option is a modified version of the queen's 8 cell neighbourhood in which 
+diagonals weights are 2^0.5x higher than horizontal/vertical weights.}
 }
 \value{
 List of effective distance d_ij matrices for each subgraph.
@@ -43,4 +47,5 @@ TO DO: add description
 }
 \examples{
 # TO DO: examples
+
 }

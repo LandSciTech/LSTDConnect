@@ -18,6 +18,7 @@ License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
+    methods,
     raster,
     dplyr,
     rgeos,
@@ -25,8 +26,9 @@ Imports:
     data.table,
     igraph,
     samc,
-    methods,
-    Rcpp
+    Rcpp,
+    SpaDES.tools,
+    plyr
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1
 Collate:
@@ -41,4 +43,6 @@ Collate:
     'parcConnectedness.R'
     'samc.R'
 Suggests:
-    testthat
+    testthat,
+    spatialfil,
+    velox
