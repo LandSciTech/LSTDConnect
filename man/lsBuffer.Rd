@@ -14,7 +14,10 @@ lsBuffer(x, width, subset = NULL)
 
 \item{width}{Numeric. Width of buffer to apply, in the units of x.}
 
-\item{subset}{Logical expression. Optional. Passed as an argument to the subset function in order to select a subset of raster values or polygons. Default for rasters is expression(x!=0) - 0s and NAs are ignored. Default for polygons is NULL (all polygons selected).}
+\item{subset}{Logical expression. Optional. Passed as an argument to the subset 
+function in order to select a subset of raster values or polygons. Default 
+for rasters is expression(x!=0) - 0s and NAs are ignored. Default for 
+polygons is NULL (all polygons selected).}
 }
 \value{
 A binary RasterLayer object showing buffered area.
@@ -27,4 +30,5 @@ For a Raster* object use velox package.
 }
 \examples{
 # TODO: examples
+
 }
