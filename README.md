@@ -4,8 +4,7 @@
 # LSTDConnect
 
 <!-- badges: start -->
-
-[![R-CMD-check](https://github.com/LandSciTech/LSTDConnect/workflows/R-CMD-check/badge.svg)](https://github.com/LandSciTech/LSTDConnect/actions)
+<!-- [![R-CMD-check](https://github.com/LandSciTech/LSTDConnect/workflows/R-CMD-check/badge.svg)](https://github.com/LandSciTech/LSTDConnect/actions) -->
 <!-- badges: end -->
 
 The goal of LSTDConnect is to provide landscpae ecology tools for the
