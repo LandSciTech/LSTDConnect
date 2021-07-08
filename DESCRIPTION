@@ -2,18 +2,20 @@ Package: LSTDConnect
 Type: Package
 Title: ECCC Landscape Science & Technology Division Connectivity Analysis Tools
 Version: 0.1.0
-Authors@R:
-    c(person(given = "Josie",
-           family = "Hughes",
-           role = c("aut", "cre"),
-           email = "josie.hughes@canada.ca"),
-    person(given="Her Majesty the Queen in Right of Canada, as represented by the Minister of Environment and Climate Change",
+Authors@R:c(
+    person("Josie", "Hughes", email = "josie.hughes@canada.ca",
+           role = c("aut", "cre")),
+    person("Griffin", "Barrett", email = "griffin-barrett@outlook.com", 
+           role = c("aut")), 
+    person("Valentin", "Lucet", email = "valentin.lucet@gmail.com", 
+           role = c("aut")),
+    person(given="Her Majesty the Queen in Right of Canada, as represented by the 
+                  Minister of Environment and Climate Change",
            role = c("cph")))
-Maintainer: Josie Hughes <josie.hughes@canada.ca>
 Date: 2020-02-12
-URL:
-    https://github.com/LandSciTech/LSTDConnect/
-Description: Connectivity and distance weighted sum methods. This package is in development, and may or may not function.
+URL: https://github.com/LandSciTech/LSTDConnect/
+Description: Connectivity and distance weighted sum methods. This package is in 
+    development, and may or may not function.
 License: file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -31,17 +33,6 @@ Imports:
     plyr
 LinkingTo: Rcpp
 RoxygenNote: 7.1.1
-Collate:
-    'AAAClassDefinitions.R'
-    'RcppExports.R'
-    'helperFns.R'
-    'applySAMC.R'
-    'convolution.R'
-    'costs.R'
-    'leastCostPathDistances.R'
-    'lsBuffer.R'
-    'parcConnectedness.R'
-    'samc.R'
 Suggests:
     testthat,
     spatialfil,
