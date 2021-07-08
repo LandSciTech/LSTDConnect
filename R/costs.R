@@ -1,7 +1,22 @@
-#' @include AAAClassDefinitions.R
-#' @include helperFns.R
-NULL
-
+#' Manipulate costs information
+#' 
+#' Two functions to manipulate the information related to costs
+#' 
+#' @param composites TODO
+#' @param landclasses TODO
+#' @param outDir TODO
+#' @param outName TODO
+#' @param costOptions TODO
+#' @param costScns TODO
+#' @param extraProtectionValue TODO
+#' @param exemptionClasses TODO
+#' @param costFile TODO
+#' 
+#' @return 
+#' TODO
+#' 
+#' 
+#' @rdname costs
 #' @export
 setCosts <- function(composites, landclasses, outDir, outName, costOptions, 
                      costScns = NULL, extraProtectionValue = c(), 
@@ -86,6 +101,7 @@ setCosts <- function(composites, landclasses, outDir, outName, costOptions,
   return(outPaths)
 }
 
+#' @rdname costs
 #' @export
 getCostOptions <- function(costFile) {
   costOptions <- read.csv(costFile, stringsAsFactors = F)

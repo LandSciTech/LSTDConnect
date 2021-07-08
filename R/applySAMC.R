@@ -1,7 +1,3 @@
-#' @include AAAClassDefinitions.R
-#' @include helperFns.R
-NULL
-
 #' SAMC disperser distribution
 #'
 #' @param occurrence RasterLayer or matrix. Initial disperser distribution.

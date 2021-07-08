@@ -1,6 +1,3 @@
-#' @include AAAClassDefinitions.R
-#' @include helperFns.R
-NULL
 # Note this is copied from lstools to avoid dependence on a private repository - 
 # reintegrate once that library is public.
 

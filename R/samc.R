@@ -1,23 +1,29 @@
 #' @useDynLib LSTDConnect
 #' @importFrom Rcpp sourceCpp
 #' @importFrom Rcpp evalCpp
+NULL
 
-.compare_implementations <- function(t, resistance, fidelity, absorbtion, 
-                                     population, kernel = 8) {
-  samc_obj <- samc::samc(resistance, absorbtion, fidelity, 
-                         tr_fun = function(x) 1 / mean(x), override = TRUE, directions = kernel)
-  
-  acc <- matrix(0, nrow(population), ncol(population))
-  
-  for (i in 1:length(population)) {
-    acc <- acc + population[i] * matrix(samc::distribution(samc_obj, origin = i, time = t), 
-                                        nrow(population), ncol(population), byrow = TRUE)
-  }
-  
-  return(acc - samc_step(t, samc_cache(resistance, fidelity, absorbtion, kernel), 
-                         population)[["population"]][[1]])
-}
-
+#' SAMC Implementation
+#' 
+#' TODO
+#' 
+#' @param resistance TODO
+#' @param fidelity TODO
+#' @param absorbtion TODO
+#' @param kernel TODO
+#' @param resistance_na_mask TODO
+#' @param absorbtion_na_mask TODO
+#' @param fidelity_na_mask TODO
+#' @param symmetric TODO
+#' @param steps TODO
+#' @param cache TODO
+#' @param population TODO
+#' @param dead TODO
+#' 
+#' @return 
+#' TODO
+#' 
+#' @rdname samc
 #' @export
 samc_cache <- function(resistance, fidelity = NULL, absorbtion = NULL, kernel = 8, 
                        resistance_na_mask = 0, absorbtion_na_mask = 0, 
@@ -99,7 +105,7 @@ samc_cache <- function(resistance, fidelity = NULL, absorbtion = NULL, kernel = 
   return(cache_samc_cpp(kernel, resistance, fidelity, absorbtion, symmetric))
 }
 
-
+#' @rdname samc
 #' @export
 samc_step <- function(steps = 1, cache, population, dead = NULL) {
   if (!is.numeric(steps)) {
@@ -136,4 +142,22 @@ samc_step <- function(steps = 1, cache, population, dead = NULL) {
   }
   
   return(samc_step_cpp(steps, cache, population, dead))
+}
+
+# Helpers -----------------------------------------------------------------
+
+.compare_implementations <- function(t, resistance, fidelity, absorbtion, 
+                                     population, kernel = 8) {
+  samc_obj <- samc::samc(resistance, absorbtion, fidelity, 
+                         tr_fun = function(x) 1 / mean(x), override = TRUE, directions = kernel)
+  
+  acc <- matrix(0, nrow(population), ncol(population))
+  
+  for (i in 1:length(population)) {
+    acc <- acc + population[i] * matrix(samc::distribution(samc_obj, origin = i, time = t), 
+                                        nrow(population), ncol(population), byrow = TRUE)
+  }
+  
+  return(acc - samc_step(t, samc_cache(resistance, fidelity, absorbtion, kernel), 
+                         population)[["population"]][[1]])
 }

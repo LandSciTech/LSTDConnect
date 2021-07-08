@@ -1,7 +1,3 @@
-#' @include AAAClassDefinitions.R
-#' @include helperFns.R
-NULL
-
 # @name ParcConnectedness
 # @rdname ParcConnectedness-class
 setMethod(f = "initialize", signature = "ParcConnectedness", 
