@@ -1,3 +1,13 @@
+#' TODO
+#' 
+#' TODO
+#' 
+#' @param sim TODO
+#' @param neighbourhood TODO
+#' 
+#' @return 
+#' TODO
+#' 
 #' @import data.table
 #' @export
 roadCLUS.getGraph <- function(sim, neighbourhood) {
@@ -76,6 +86,8 @@ roadCLUS.getGraph <- function(sim, neighbourhood) {
   gc() # garbage collection
   return(invisible(sim))
 }
+
+# Helpers -----------------------------------------------------------------
 
 stripX <- function(x, parts = 1, sep = "_") {
   # x=testSet$landscape[1]
