@@ -26,30 +26,30 @@ setGeneric("lsBuffer", function(x, width, subset = NULL) standardGeneric("lsBuff
 #' @export
 setMethod("lsBuffer", signature(x = "RasterLayer"), 
           function(x, width, subset) {
-  # x=patches;subset=NULL;width=buffDist#x=x[[kk]]
-
-  if (is.null(subset)) {
-    subset <- expression(x != 0)
-  }
-
-  xtemp <- x # distinguish between NA values and 0 values. Note velox does not handle NA values well.
-  x[is.na(x)] <- 0
-
-  x[!eval(subset)] <- 0 # TO DO test this.
-  if (length(raster::unique(x)) > 0) {
-    if (width > 0) {
-      weights <- uniformKernel(width, raster::res(x)[1])
-
-      vx <- velox::velox(x)
-      vx$sumFocal(weights = weights, bands = c(1))
-
-      x <- vx$as.RasterLayer()
-      x[x != 0] <- 1
-    } else {
-      x[x > 1] <- 1
-    }
-  }
-  x[is.na(x)] <- 0
-  x[is.na(xtemp)] <- NA
-  return(x)
-})
+            # x=patches;subset=NULL;width=buffDist#x=x[[kk]]
+            
+            if (is.null(subset)) {
+              subset <- expression(x != 0)
+            }
+            
+            xtemp <- x # distinguish between NA values and 0 values. Note velox does not handle NA values well.
+            x[is.na(x)] <- 0
+            
+            x[!eval(subset)] <- 0 # TO DO test this.
+            if (length(raster::unique(x)) > 0) {
+              if (width > 0) {
+                weights <- uniformKernel(width, raster::res(x)[1])
+                
+                vx <- velox::velox(x)
+                vx$sumFocal(weights = weights, bands = c(1))
+                
+                x <- vx$as.RasterLayer()
+                x[x != 0] <- 1
+              } else {
+                x[x > 1] <- 1
+              }
+            }
+            x[is.na(x)] <- 0
+            x[is.na(xtemp)] <- NA
+            return(x)
+          })
