@@ -7,3 +7,5 @@ LSTDConnectInstall.R
 LSTDConnect.Rproj
 nonVersionedInput
 output
+*.o
+*.so
