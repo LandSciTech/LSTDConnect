@@ -68,7 +68,7 @@ setMethod("applySAMC", signature(occurrence = "matrix"),
             }
             if (!is.null(d)) {
               stop("TO DO: create & use lookup table to find t that most closely corraster::responds to selected dbar.")
-              cellDim <- raster::res(quality)[1]
+              cellDim <- raster::res(occurrence)[1]
               dbar <- d / cellDim
               # TO DO: create & use lookup table to find t that most closely corresponds to selected dbar.
             }
