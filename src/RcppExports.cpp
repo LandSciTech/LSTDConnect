@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // cache_samc
 Rcpp::XPtr<samc::cache> cache_samc(const Rcpp::NumericMatrix& kernel, const Rcpp::NumericMatrix& resistance, const Rcpp::NumericMatrix& fidelity, const Rcpp::NumericMatrix& absorbtion, const bool symmetric);
 RcppExport SEXP _LSTDConnect_cache_samc(SEXP kernelSEXP, SEXP resistanceSEXP, SEXP fidelitySEXP, SEXP absorbtionSEXP, SEXP symmetricSEXP) {
