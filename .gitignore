@@ -2,10 +2,14 @@
 .Rhistory
 .RData
 .Ruserdata
-.Rbuildignore
 LSTDConnectInstall.R
 LSTDConnect.Rproj
 nonVersionedInput
 output
 *.o
+<<<<<<< HEAD
 *.so
+=======
+*.so
+*.dll
+>>>>>>> 3bcf1c1b53a49cb911ee79a8339fc31163ebfff1
