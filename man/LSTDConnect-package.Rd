@@ -6,8 +6,7 @@
 \alias{LSTDConnect-package}
 \title{LSTDConnect: ECCC Landscape Science & Technology Division Connectivity Analysis Tools}
 \description{
-Connectivity and distance weighted sum methods. This package is in 
-    development, and may or may not function.
+Connectivity and distance weighted sum methods. This package is in development, and may or may not function.
 }
 \seealso{
 Useful links:
@@ -27,8 +26,7 @@ Authors:
 
 Other contributors:
 \itemize{
-  \item Her Majesty the Queen in Right of Canada, as represented by the 
-                  Minister of Environment and Climate Change [copyright holder]
+  \item Her Majesty the Queen in Right of Canada, as represented by the Minister of Environment and Climate Change [copyright holder]
 }
 
 }

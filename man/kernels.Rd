@@ -5,26 +5,20 @@
 \alias{exponentialKernel}
 \title{Convolution kernels}
 \usage{
-uniformKernel(dmax, cellDim = 1, useAveDist = F)
+uniformKernel(r = NULL, mu = NULL, cellDim = 1)
 
-exponentialKernel(
-  dbar,
-  cellDim = 1,
-  negligible = 10^-10,
-  returnScale = F,
-  dmax = NULL
-)
+exponentialKernel(mu, cellDim = 1, negligible = 10^-10)
 }
 \arguments{
-\item{dmax}{TODO}
-
 \item{cellDim}{TODO}
+
+\item{negligible}{TODO}
+
+\item{dmax}{TODO}
 
 \item{useAveDist}{TODO}
 
-\item{dbar}{TODO}
-
-\item{negligible}{TODO}
+\item{dbar}{}
 
 \item{returnScale}{TODO}
 }
