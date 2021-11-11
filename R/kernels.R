@@ -5,47 +5,44 @@
 #' @param dmax TODO
 #' @param cellDim TODO
 #' @param useAveDist TODO
-#' @param dbar TODO
+#' @param dbar 
 #' @param negligible TODO
 #' @param returnScale TODO
-#' @param dmax TODO
 #' 
 #' @return 
 #' A kernel (`matrix`).
 #' 
 #' @rdname kernels
 #' @export
-uniformKernel <- function(dmax, cellDim = 1, useAveDist = F) {
-  if (useAveDist) {
+uniformKernel <- function(r=NULL, mu=NULL, cellDim = 1) {
+  if (!is.null(mu)) {
     # https://math.stackexchange.com/questions/3019165/average-distance-from-center-of-circle
-    dmax <- 3 * dmax / 2
+    r <- 3 * mu / 2
   }
-  hdim <- ceiling(dmax / cellDim)
+  hdim <- ceiling(r / cellDim)
   weights <- getDistKernelFromMax(hdim)
-  weights <- weights <= dmax / cellDim
+  weights <- weights <= r / cellDim
   weights <- weights / sum(weights)
   return(weights)
 }
 
 #' @rdname kernels
 #' @export
-exponentialKernel <- function(dbar, cellDim = 1, negligible = 10^-10, 
-                              returnScale = F, dmax = NULL) {
+exponentialKernel <- function(mu, cellDim = 1, negligible = 10^-10) {
   # Exponential kernel from Hughes et al 2015 American Naturalist
-  dbarCell <- dbar / cellDim
-  if (is.null(dmax)) {
-    dmax <- -0.5 * dbarCell * log(pi * dbarCell^2 * negligible / 2)
-    if (dmax < 0) {
-      stop("Set negligible so that pi*dbar^2*negligible/2 <=1")
-    }
+  muCell <- mu / cellDim
+  
+  dmax <- -0.5 * muCell * log(pi * muCell^2 * negligible / 2)
+  
+  if (dmax < 0) {
+    stop("Set negligible so that pi*mu^2*negligible/2 <=1")
   }
+  
   kdim <- floor(dmax / 2) * 2
   d <- getDistKernelFromMax(kdim)
-  m <- (2 / (pi * dbarCell^2)) * exp(-2 * d / dbarCell)
+  m <- (2 / (pi * muCell^2)) * exp(-2 * d / muCell)
   m[m < negligible] <- 0
-  if (returnScale) {
-    return(sum(m))
-  }
+  
   k <- m / sum(m)
   return(k)
 }
