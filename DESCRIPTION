@@ -35,6 +35,3 @@ LinkingTo: Rcpp
 RoxygenNote: 7.1.2
 Suggests:
     testthat
-Remotes:
-    github::nickwing/spatialfil,
-    github::hunzikp/velox
