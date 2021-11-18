@@ -2,12 +2,12 @@
 #' 
 #' Creates a convolution kernel
 #' 
-#' @param dmax TODO
-#' @param cellDim TODO
-#' @param useAveDist TODO
-#' @param dbar 
-#' @param negligible TODO
-#' @param returnScale TODO
+#' @param r The radius of the kernel, in physical units.
+#' @param mu Alternative to r, so that r = 3 * mu / 2 (equation for the 
+#'    average distance from the center of a circle).
+#' @param cellDim Default to 1, cell dimensions used as a scaling factor 
+#'    for the kernel size
+#' @param negligible Negligible value when rounding edges of exponential kernels.
 #' 
 #' @return 
 #' A kernel (`matrix`).

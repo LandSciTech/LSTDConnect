@@ -10,17 +10,15 @@ uniformKernel(r = NULL, mu = NULL, cellDim = 1)
 exponentialKernel(mu, cellDim = 1, negligible = 10^-10)
 }
 \arguments{
-\item{cellDim}{TODO}
+\item{r}{The radius of the kernel, in physical units.}
 
-\item{negligible}{TODO}
+\item{mu}{Alternative to r, so that r = 3 * mu / 2 (equation for the
+average distance from the center of a circle).}
 
-\item{dmax}{TODO}
+\item{cellDim}{Default to 1, cell dimensions used as a scaling factor
+for the kernel size}
 
-\item{useAveDist}{TODO}
-
-\item{dbar}{}
-
-\item{returnScale}{TODO}
+\item{negligible}{Negligible value when rounding edges of exponential kernels.}
 }
 \value{
 A kernel (\code{matrix}).
