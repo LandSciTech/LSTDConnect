@@ -199,5 +199,5 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
   
   return(acc - LSTDConnect::distribution(
     LSTDConnect::samc(data, fidelity, absorption, directions), 
-    occ, time = 1)[["population"]][[1]])
+    occ, time = 1)[["occ"]][[1]])
 }

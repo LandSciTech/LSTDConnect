@@ -272,7 +272,7 @@ Rcpp::List samc_step(
     //add to output lists
   }
 
-  return Rcpp::List::create(Rcpp::Named("steps") = steps, Rcpp::Named("population") = pops, Rcpp::Named("deaths") = deads);
+  return Rcpp::List::create(Rcpp::Named("time") = steps, Rcpp::Named("occ") = pops, Rcpp::Named("deaths") = deads);
 }
 
 
