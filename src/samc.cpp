@@ -22,7 +22,7 @@ inline void construct_cache(
     const std::vector<kernel_point_t>& kernel,
     const Rcpp::NumericMatrix& resistance,
     const Rcpp::NumericMatrix& fidelity,
-    const Rcpp::NumericMatrix& absorbtion){
+    const Rcpp::NumericMatrix& absorption){
 
   ca.kernel_size = kernel.size();
   ca.nrow = resistance.nrow();
@@ -31,7 +31,7 @@ inline void construct_cache(
   ca.movement_rate.clear();
   ca.movement_rate.resize(ca.kernel_size*ca.nrow*ca.ncol, {0});
 
-  ca.absorbtion.assign(absorbtion.begin(),absorbtion.end());
+  ca.absorption.assign(absorption.begin(),absorption.end());
 
   std::ptrdiff_t max_offset = 0;
   std::ptrdiff_t min_offset = 0;
@@ -66,18 +66,18 @@ inline void construct_cache(
       }
       double t_scalar = 0;
       double t_fidelity = fidelity[y+x*ca.nrow];
-      const double t_absorbtion = absorbtion[y+x*ca.nrow];
+      const double t_absorption = absorption[y+x*ca.nrow];
       if(weighted_sum == 0){
         t_scalar = 0;
-        t_fidelity = 1.0-t_absorbtion;
+        t_fidelity = 1.0-t_absorption;
       }else{
-        t_scalar = (1.0-(t_fidelity+t_absorbtion))/weighted_sum;
+        t_scalar = (1.0-(t_fidelity+t_absorption))/weighted_sum;
       }
 
       const double l_scalar     = t_scalar;
       const double l_fidelity   = t_fidelity;
 
-      //if(printing) Rcpp::Rcout << "b:" << weighted_sum << ", " << l_scalar << ", " << l_fidelity << ", " << t_absorbtion << "\n";
+      //if(printing) Rcpp::Rcout << "b:" << weighted_sum << ", " << l_scalar << ", " << l_fidelity << ", " << t_absorption << "\n";
 
       //Rcpp::Rcout << "(" << x << "," << y << "," << scalar << ")\n";
       //can be simd
@@ -106,7 +106,7 @@ Rcpp::XPtr<samc::cache> cache_samc(
     const Rcpp::NumericMatrix& kernel,
     const Rcpp::NumericMatrix& resistance,
     const Rcpp::NumericMatrix& fidelity,
-    const Rcpp::NumericMatrix& absorbtion,
+    const Rcpp::NumericMatrix& absorption,
     const bool symmetric){
 
   std::vector<samc::kernel_point_t> kv{};
@@ -131,9 +131,9 @@ Rcpp::XPtr<samc::cache> cache_samc(
 
   samc::cache* ca = new samc::cache;
   if(symmetric){
-    samc::construct_cache<true>(*ca, kv, resistance, fidelity, absorbtion);
+    samc::construct_cache<true>(*ca, kv, resistance, fidelity, absorption);
   }else{
-    samc::construct_cache<false>(*ca, kv, resistance, fidelity, absorbtion);
+    samc::construct_cache<false>(*ca, kv, resistance, fidelity, absorption);
   }
   Rcpp::XPtr<samc::cache> xp(ca, true);
   /*
@@ -141,7 +141,7 @@ Rcpp::XPtr<samc::cache> cache_samc(
   for(size_t x = 0; x<ca->ncol; x++){
     for(size_t y = 0; y<ca->nrow; y++){
       size_t i = y+x*ca->nrow;
-      Rcpp::Rcout << "{\"x\": " << x << ", \"y\": " << y << ", \"absorbtion\": " << ca->absorbtion[i] << ", \"movement_rate\": [";
+      Rcpp::Rcout << "{\"x\": " << x << ", \"y\": " << y << ", \"absorption\": " << ca->absorption[i] << ", \"movement_rate\": [";
       bool first = true;
       for(size_t j = 0; j<ca->kernel_size; j++){
         if(first){first = false;}else{
@@ -178,8 +178,8 @@ inline void samc_one_step(
 #ifdef _OPENMP
   #pragma omp parallel for
 #endif
-  for(std::size_t i = 0; i<ca.absorbtion.size(); i++){
-    d_out[i] = d_in[i]+ca.absorbtion[i]*p_in[i];
+  for(std::size_t i = 0; i<ca.absorption.size(); i++){
+    d_out[i] = d_in[i]+ca.absorption[i]*p_in[i];
     double acc = 0;
     for(std::size_t con = 0; con < ca.kernel_size; con++){
       //Rcpp::Rcout << i << ", " << i%ca.nrow << ", " << i/ca.nrow << ", " << con << ", " << i*ca.kernel_size+con << ", " << i+ca.kernel[con] << ", " << ca.movement_rate[i*ca.kernel_size+con] << '\n';

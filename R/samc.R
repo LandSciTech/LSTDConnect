@@ -3,134 +3,172 @@
 #' @importFrom Rcpp evalCpp
 NULL
 
-#' SAMC Implementation
+#' Spatial Absorbing Markov Chain (SAMC) in parallel
 #' 
-#' TODO
+#' Implements the SAMC algorithm from [samc][samc::samc()].
 #' 
-#' @param resistance TODO
-#' @param fidelity TODO
-#' @param absorbtion TODO
-#' @param kernel TODO
-#' @param resistance_na_mask TODO
-#' @param absorbtion_na_mask TODO
-#' @param fidelity_na_mask TODO
-#' @param symmetric TODO
-#' @param steps TODO
-#' @param cache TODO
-#' @param population TODO
-#' @param dead TODO
+#' @param directions Either 4 (rook) or 8 (queen), the directions of movement.
+#' @param kernel Alternative to "directions", a square kernel.
+#' @param data_na_mask Default to 0, the value to give to NAs and NaNs values 
+#'     in data.
+#' @param absorption_na_mask Default to 0, the value to give to NAs and NaNs 
+#'     values in absorption.
+#' @param fidelity_na_mask Default to 0, the value to give to NAs and NaNs 
+#'     values in fidelity.
+#' @param symmetric Default to true, whether movement is symmetrical 
+#'     between cells.
+#' 
+#' @param occ The initial state of the model (abundance matrix).
+#' @param dead Optionnal matrix containing information on deaths.
+#' @param time A positive integer or a vector of positive integers representing
+#'     time steps.
+#' 
+#' @inheritParams samc::samc
+#' 
+#' 
+#' @param samc A list resulting from calling samc.
+#' @inheritParams samc::distribution
 #' 
 #' @return 
-#' TODO
+#' `samc` will return a list.
+#' `distribution` will also return a list.
 #' 
 #' @rdname samc
 #' @export
-samc_cache <- function(resistance, fidelity = NULL, absorbtion = NULL, kernel = 8, 
-                       resistance_na_mask = 0, absorbtion_na_mask = 0, 
-                       fidelity_na_mask = 0, symmetric = TRUE) {
-  if (!is.numeric(resistance) || !is.matrix(resistance)) {
-    stop("resistance must be a numeric matrix")
+samc <- function(data, absorption = NULL, fidelity = NULL, 
+                 directions = 8, kernel = NULL, 
+                 data_na_mask = 0, absorption_na_mask = 0, 
+                 fidelity_na_mask = 0, symmetric = TRUE) {
+  
+  if (!is.numeric(data) || !is.matrix(data)) {
+    stop("'data' must be a numeric matrix")
   }
   
-  if (!is.numeric(kernel)) {
-    stop("kernel must be numeric")
-  } else if (is.matrix(kernel)) {
-    if (!(nrow(kernel) %% 2) || !(ncol(kernel) %% 2)) {
-      stop("If the kernel is a matrix, it must be an n*m matrix where both n and m are odd")
+  if(is.null(directions) & is.null(kernel)){
+    stop(paste0("You must provide one of 'directions' (num value of 4 or 8) OR",
+                " 'kernel' (an odd sided matrix) "))
+  }
+  
+  if (is.null(kernel)){
+    
+    if(!is.numeric(directions)){
+      stop("kernel must be numeric")
     }
-  } else if (kernel == 4) {
-    kernel <- matrix(
-      c(
-        0, 1, 0,
-        1, 0, 1,
-        0, 1, 0
-      ), 3, 3
-    )
-  } else if (kernel == 8) {
-    kernel <- matrix(
-      c(
-        1 / sqrt(2), 1, 1 / sqrt(2),
-        1.0000000, 0, 1.0000000,
-        1 / sqrt(2), 1, 1 / sqrt(2)
-      ), 3, 3
-    )
+    
+    if (directions == 4) {
+      
+      kernel <- matrix(
+        c(
+          0, 1, 0,
+          1, 0, 1,
+          0, 1, 0
+        ), 3, 3
+      )
+      
+    } else if (directions == 8) {
+      
+      kernel <- matrix(
+        c(
+          1 / sqrt(2), 1, 1 / sqrt(2),
+          1.0000000, 0, 1.0000000,
+          1 / sqrt(2), 1, 1 / sqrt(2)
+        ), 3, 3
+      )
+      
+    } else {
+      
+      stop("'directions' must be equal to either 4 or 8")
+      
+    }
+    
   } else {
-    stop("If kernel is not a matrix, it must be equal to 4 or 8")
+    
+    if (!is.numeric(kernel)) {
+      stop("kernel must be numeric")
+      
+    } else if (is.matrix(kernel)) {
+      
+      if (!(nrow(kernel) %% 2) || !(ncol(kernel) %% 2)) {
+        stop("If the kernel is a matrix, it must be an n*m matrix where both n and m are odd")
+      }
+    }
   }
   
-  if (is.null(absorbtion)) {
-    absorbtion <- matrix(0, nrow(resistance), ncol(resistance))
-  } else if (is.numeric(absorbtion) && !is.matrix(absorbtion)) {
-    absorbtion <- matrix(absorbtion, nrow(resistance), ncol(resistance))
-  } else if (!is.numeric(absorbtion) || !is.matrix(absorbtion)) {
-    stop("absorbtion must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no absorbtion")
+  # -------------------------------------------------------------------------
+  
+  if (is.null(absorption)) {
+    absorption <- matrix(0, nrow(data), ncol(data))
+  } else if (is.numeric(absorption) && !is.matrix(absorption)) {
+    absorption <- matrix(absorption, nrow(data), ncol(data))
+  } else if (!is.numeric(absorption) || !is.matrix(absorption)) {
+    stop("absorption must be a numeric matrix of the same dimentions as data, or a numeric to be used to create such a matrix, or null to default to no absorption")
   }
   
-  if (!all(dim(resistance) == dim(absorbtion))) {
-    stop("If absorbtion is a matrix, it must be of the same dimentions as resistance")
+  if (!all(dim(data) == dim(absorption))) {
+    stop("If absorption is a matrix, it must be of the same dimentions as data")
   }
   
   if (is.null(fidelity)) {
-    fidelity <- matrix(0, nrow(resistance), ncol(resistance))
+    fidelity <- matrix(0, nrow(data), ncol(data))
   } else if (is.numeric(fidelity) && !is.matrix(fidelity)) {
-    fidelity <- matrix(fidelity, nrow(resistance), ncol(resistance))
+    fidelity <- matrix(fidelity, nrow(data), ncol(data))
   } else if (!is.numeric(fidelity) || !is.matrix(fidelity)) {
-    stop("fidelity must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no fidelity")
+    stop("fidelity must be a numeric matrix of the same dimentions as data, or a numeric to be used to create such a matrix, or null to default to no fidelity")
   }
   
-  if (!all(dim(resistance) == dim(fidelity))) {
-    stop("If fidelity is a matrix, it must be of the same dimentions as resistance")
+  if (!all(dim(data) == dim(fidelity))) {
+    stop("If fidelity is a matrix, it must be of the same dimentions as data")
   }
   
-  resistance[!is.finite(resistance)] <- resistance_na_mask
-  absorbtion[!is.finite(absorbtion)] <- absorbtion_na_mask
+  data[!is.finite(data)] <- data_na_mask
+  absorption[!is.finite(absorption)] <- absorption_na_mask
   fidelity[!is.finite(fidelity)] <- fidelity_na_mask
   
-  if (any(0 > resistance)) {
-    stop("resistance must > 0")
+  if (any(0 > data)) {
+    stop("data must > 0")
   }
   
-  if (any(0 > absorbtion || absorbtion > 1)) {
-    stop("absorbtion must be in the range [0,1]")
+  if (any(0 > absorption || absorption > 1)) {
+    stop("absorption must be in the range [0,1]")
   }
   
   if (any(0 > fidelity || fidelity > 1)) {
     stop("fidelity must be in the range [0,1]")
   }
   
-  if (any(fidelity + absorbtion > 1)) {
-    stop("fidelity+absorbtion must be <= 1")
+  if (any(fidelity + absorption > 1)) {
+    stop("fidelity+absorption must be <= 1")
   }
   
-  return(cache_samc_cpp(kernel, resistance, fidelity, absorbtion, symmetric))
+  return(cache_samc_cpp(kernel, data, fidelity, absorption, symmetric))
 }
 
 #' @rdname samc
 #' @export
-samc_step <- function(steps = 1, cache, population, dead = NULL) {
-  if (!is.numeric(steps)) {
-    stop("steps must be numeric")
-    # }else if(length(steps) <= 0){
-    stop("steps must have a length of at least 1")
+distribution <- function(samc, occ, time = 1, dead = NULL) {
+  if (!is.numeric(time)) {
+    stop("time must be numeric")
+    # }else if(length(time) <= 0){
+    stop("time must have a length of at least 1")
   }
   
   warned_about_rounding <- FALSE
-  for (i in 1:length(steps)) {
-    if (steps[i] %% 1 && !warned_about_rounding) {
+  for (i in 1:length(time)) {
+    if (time[i] %% 1 && !warned_about_rounding) {
       warned_about_rounding <- TRUE
-      warning("steps values should be whole numbers. The fractional part will be truncated off.")
+      warning("time values should be whole numbers. The fractional part will be truncated off.")
     }
   }
-  steps <- as.integer(floor(steps))
+  time <- as.integer(floor(time))
   
-  sizes <- samc_cache_sizes_cpp(cache)
+  sizes <- samc_cache_sizes_cpp(samc)
   # print(sizes)
   # {ca->nrow, ca->ncol, ca->left_extra_cols, ca->right_extra_cols};
   
-  if (nrow(population) != sizes[1]) {
-    stop("Population has the wrong height")
-  } else if (ncol(population) != sizes[2]) {
-    stop("Population has the wrong width")
+  if (nrow(occ) != sizes[1]) {
+    stop("occ has the wrong height")
+  } else if (ncol(occ) != sizes[2]) {
+    stop("occ has the wrong width")
   }
   
   if (is.null(dead)) {
@@ -141,23 +179,25 @@ samc_step <- function(steps = 1, cache, population, dead = NULL) {
     stop("Dead has the wrong width")
   }
   
-  return(samc_step_cpp(steps, cache, population, dead))
+  return(samc_step_cpp(time, samc, occ, dead))
 }
 
 # Helpers -----------------------------------------------------------------
 
-.compare_implementations <- function(t, resistance, fidelity, absorbtion, 
-                                     population, kernel = 8) {
-  samc_obj <- samc::samc(resistance, absorbtion, fidelity, 
-                         tr_fun = function(x) 1 / mean(x), override = TRUE, directions = kernel)
+.compare_implementations <- function(t, data, absorption, fidelity,
+                                     occ, directions = 8) {
   
-  acc <- matrix(0, nrow(population), ncol(population))
+  samc_obj <- samc::samc(data, absorption, fidelity, 
+                         tr_fun = function(x) 1 / mean(x), override = TRUE, directions = directions)
   
-  for (i in 1:length(population)) {
-    acc <- acc + population[i] * matrix(samc::distribution(samc_obj, origin = i, time = t), 
-                                        nrow(population), ncol(population), byrow = TRUE)
+  acc <- matrix(0, nrow(occ), ncol(occ))
+  
+  for (i in 1:length(occ)) {
+    acc <- acc + occ[i] * matrix(samc::distribution(samc_obj, origin = i, time = t), 
+                                 nrow(occ), ncol(occ), byrow = TRUE)
   }
   
-  return(acc - samc_step(t, samc_cache(resistance, fidelity, absorbtion, kernel), 
-                         population)[["population"]][[1]])
+  return(acc - LSTDConnect::distribution(
+    LSTDConnect::samc(data, fidelity, absorption, directions), 
+    occ, time = 1)[["population"]][[1]])
 }

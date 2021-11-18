@@ -12,17 +12,17 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // cache_samc
-Rcpp::XPtr<samc::cache> cache_samc(const Rcpp::NumericMatrix& kernel, const Rcpp::NumericMatrix& resistance, const Rcpp::NumericMatrix& fidelity, const Rcpp::NumericMatrix& absorbtion, const bool symmetric);
-RcppExport SEXP _LSTDConnect_cache_samc(SEXP kernelSEXP, SEXP resistanceSEXP, SEXP fidelitySEXP, SEXP absorbtionSEXP, SEXP symmetricSEXP) {
+Rcpp::XPtr<samc::cache> cache_samc(const Rcpp::NumericMatrix& kernel, const Rcpp::NumericMatrix& resistance, const Rcpp::NumericMatrix& fidelity, const Rcpp::NumericMatrix& absorption, const bool symmetric);
+RcppExport SEXP _LSTDConnect_cache_samc(SEXP kernelSEXP, SEXP resistanceSEXP, SEXP fidelitySEXP, SEXP absorptionSEXP, SEXP symmetricSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type kernel(kernelSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type resistance(resistanceSEXP);
     Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type fidelity(fidelitySEXP);
-    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type absorbtion(absorbtionSEXP);
+    Rcpp::traits::input_parameter< const Rcpp::NumericMatrix& >::type absorption(absorptionSEXP);
     Rcpp::traits::input_parameter< const bool >::type symmetric(symmetricSEXP);
-    rcpp_result_gen = Rcpp::wrap(cache_samc(kernel, resistance, fidelity, absorbtion, symmetric));
+    rcpp_result_gen = Rcpp::wrap(cache_samc(kernel, resistance, fidelity, absorption, symmetric));
     return rcpp_result_gen;
 END_RCPP
 }

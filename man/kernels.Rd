@@ -23,7 +23,7 @@ exponentialKernel(mu, cellDim = 1, negligible = 10^-10)
 \item{returnScale}{TODO}
 }
 \value{
-A kernel (`matrix`).
+A kernel (\code{matrix}).
 }
 \description{
 Creates a convolution kernel
