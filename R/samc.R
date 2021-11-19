@@ -40,8 +40,12 @@ samc <- function(data, absorption = NULL, fidelity = NULL,
                  data_na_mask = 0, absorption_na_mask = 0, 
                  fidelity_na_mask = 0, symmetric = TRUE) {
   
-  if (!is.numeric(data) || !is.matrix(data)) {
-    stop("'data' must be a numeric matrix")
+  if (is.matrix(data)){
+    if (!is.numeric(data)) {
+      stop("'data' must be a numeric matrix")
+    }
+  } else if (class(data) == "RasterLayer"){
+    data <- as.matrix(data)
   }
   
   if(is.null(directions) & is.null(kernel)){
@@ -81,17 +85,18 @@ samc <- function(data, absorption = NULL, fidelity = NULL,
       
     }
     
-  } else {
+  }
+  
+  if (!is.numeric(kernel)) {
+    stop("kernel must be numeric")
     
-    if (!is.numeric(kernel)) {
-      stop("kernel must be numeric")
-      
-    } else if (is.matrix(kernel)) {
-      
-      if (!(nrow(kernel) %% 2) || !(ncol(kernel) %% 2)) {
-        stop("If the kernel is a matrix, it must be an n*m matrix where both n and m are odd")
-      }
+  } else if (is.matrix(kernel)) {
+    
+    if (!(nrow(kernel) %% 2) || !(ncol(kernel) %% 2)) {
+      stop("If the kernel is a matrix, it must be an n*m matrix where both n and m are odd")
     }
+  } else {
+    stop("kernel should be a matrix")
   }
   
   # -------------------------------------------------------------------------
