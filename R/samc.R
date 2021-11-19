@@ -9,8 +9,8 @@ NULL
 #' 
 #' @param directions Either 4 (rook) or 8 (queen), the directions of movement.
 #' @param kernel Alternative to "directions", a square kernel.
-#' @param data_na_mask Default to 0, the value to give to NAs and NaNs values 
-#'     in data.
+#' @param resistance_na_mask Default to 0, the value to give to NAs and NaNs values 
+#'     in resistance.
 #' @param absorption_na_mask Default to 0, the value to give to NAs and NaNs 
 #'     values in absorption.
 #' @param fidelity_na_mask Default to 0, the value to give to NAs and NaNs 
@@ -35,17 +35,17 @@ NULL
 #' 
 #' @rdname samc
 #' @export
-samc <- function(data, absorption = NULL, fidelity = NULL, 
+samc <- function(resistance, absorption = NULL, fidelity = NULL, 
                  directions = 8, kernel = NULL, 
-                 data_na_mask = 0, absorption_na_mask = 0, 
+                 resistance_na_mask = 0, absorption_na_mask = 0, 
                  fidelity_na_mask = 0, symmetric = TRUE) {
   
-  if (is.matrix(data)){
-    if (!is.numeric(data)) {
-      stop("'data' must be a numeric matrix")
+  if (is.matrix(resistance)){
+    if (!is.numeric(resistance)) {
+      stop("'resistance' must be a numeric matrix")
     }
-  } else if (class(data) == "RasterLayer"){
-    data <- as.matrix(data)
+  } else if (class(resistance) == "RasterLayer"){
+    resistance <- as.matrix(resistance)
   }
   
   if(is.null(directions) & is.null(kernel)){
@@ -102,35 +102,35 @@ samc <- function(data, absorption = NULL, fidelity = NULL,
   # -------------------------------------------------------------------------
   
   if (is.null(absorption)) {
-    absorption <- matrix(0, nrow(data), ncol(data))
+    absorption <- matrix(0, nrow(resistance), ncol(resistance))
   } else if (is.numeric(absorption) && !is.matrix(absorption)) {
-    absorption <- matrix(absorption, nrow(data), ncol(data))
+    absorption <- matrix(absorption, nrow(resistance), ncol(resistance))
   } else if (!is.numeric(absorption) || !is.matrix(absorption)) {
-    stop("absorption must be a numeric matrix of the same dimentions as data, or a numeric to be used to create such a matrix, or null to default to no absorption")
+    stop("absorption must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no absorption")
   }
   
-  if (!all(dim(data) == dim(absorption))) {
-    stop("If absorption is a matrix, it must be of the same dimentions as data")
+  if (!all(dim(resistance) == dim(absorption))) {
+    stop("If absorption is a matrix, it must be of the same dimentions as resistance")
   }
   
   if (is.null(fidelity)) {
-    fidelity <- matrix(0, nrow(data), ncol(data))
+    fidelity <- matrix(0, nrow(resistance), ncol(resistance))
   } else if (is.numeric(fidelity) && !is.matrix(fidelity)) {
-    fidelity <- matrix(fidelity, nrow(data), ncol(data))
+    fidelity <- matrix(fidelity, nrow(resistance), ncol(resistance))
   } else if (!is.numeric(fidelity) || !is.matrix(fidelity)) {
-    stop("fidelity must be a numeric matrix of the same dimentions as data, or a numeric to be used to create such a matrix, or null to default to no fidelity")
+    stop("fidelity must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no fidelity")
   }
   
-  if (!all(dim(data) == dim(fidelity))) {
-    stop("If fidelity is a matrix, it must be of the same dimentions as data")
+  if (!all(dim(resistance) == dim(fidelity))) {
+    stop("If fidelity is a matrix, it must be of the same dimentions as resistance")
   }
   
-  data[!is.finite(data)] <- data_na_mask
+  resistance[!is.finite(resistance)] <- resistance_na_mask
   absorption[!is.finite(absorption)] <- absorption_na_mask
   fidelity[!is.finite(fidelity)] <- fidelity_na_mask
   
-  if (any(0 > data)) {
-    stop("data must > 0")
+  if (any(0 > resistance)) {
+    stop("resistance must > 0")
   }
   
   if (any(0 > absorption || absorption > 1)) {
@@ -145,16 +145,25 @@ samc <- function(data, absorption = NULL, fidelity = NULL,
     stop("fidelity+absorption must be <= 1")
   }
   
-  return(cache_samc_cpp(kernel, data, fidelity, absorption, symmetric))
+  return(cache_samc_cpp(kernel, resistance, fidelity, absorption, symmetric))
 }
 
 #' @rdname samc
 #' @export
 distribution <- function(samc, occ, time = 1, dead = NULL) {
+  
   if (!is.numeric(time)) {
     stop("time must be numeric")
-    # }else if(length(time) <= 0){
+  } else if(length(time) <= 0){
     stop("time must have a length of at least 1")
+  }
+  
+  if (is.matrix(occ)){
+    if (!is.numeric(occ)) {
+      stop("'occ' must be a numeric matrix")
+    }
+  } else if (class(occ) == "RasterLayer"){
+    occ <- as.matrix(occ)
   }
   
   warned_about_rounding <- FALSE
@@ -167,8 +176,6 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
   time <- as.integer(floor(time))
   
   sizes <- samc_cache_sizes_cpp(samc)
-  # print(sizes)
-  # {ca->nrow, ca->ncol, ca->left_extra_cols, ca->right_extra_cols};
   
   if (nrow(occ) != sizes[1]) {
     stop("occ has the wrong height")
@@ -189,10 +196,10 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
 
 # Helpers -----------------------------------------------------------------
 
-.compare_implementations <- function(t, data, absorption, fidelity,
+.compare_implementations <- function(t, resistance, absorption, fidelity,
                                      occ, directions = 8) {
   
-  samc_obj <- samc::samc(data, absorption, fidelity, 
+  samc_obj <- samc::samc(resistance, absorption, fidelity, 
                          tr_fun = function(x) 1 / mean(x), override = TRUE, directions = directions)
   
   acc <- matrix(0, nrow(occ), ncol(occ))
@@ -203,6 +210,6 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
   }
   
   return(acc - LSTDConnect::distribution(
-    LSTDConnect::samc(data, fidelity, absorption, directions), 
+    LSTDConnect::samc(resistance, fidelity, absorption, directions), 
     occ, time = 1)[["occ"]][[1]])
 }

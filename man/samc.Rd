@@ -6,12 +6,12 @@
 \title{Spatial Absorbing Markov Chain (SAMC) in parallel}
 \usage{
 samc(
-  data,
+  resistance,
   absorption = NULL,
   fidelity = NULL,
   directions = 8,
   kernel = NULL,
-  data_na_mask = 0,
+  resistance_na_mask = 0,
   absorption_na_mask = 0,
   fidelity_na_mask = 0,
   symmetric = TRUE
@@ -20,7 +20,7 @@ samc(
 distribution(samc, occ, time = 1, dead = NULL)
 }
 \arguments{
-\item{data}{A \code{\link[raster]{RasterLayer-class}} or \code{\link[base]{matrix}} or Matrix package dgCMatrix sparse matrix.}
+\item{resistance}{Deprecated. Use the \code{data} parameter.}
 
 \item{absorption}{A \code{\link[raster]{RasterLayer-class}} or \code{\link[base]{matrix}}}
 
@@ -30,8 +30,8 @@ distribution(samc, occ, time = 1, dead = NULL)
 
 \item{kernel}{Alternative to "directions", a square kernel.}
 
-\item{data_na_mask}{Default to 0, the value to give to NAs and NaNs values
-in data.}
+\item{resistance_na_mask}{Default to 0, the value to give to NAs and NaNs values
+in resistance.}
 
 \item{absorption_na_mask}{Default to 0, the value to give to NAs and NaNs
 values in absorption.}
