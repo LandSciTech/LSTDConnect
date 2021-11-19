@@ -37,7 +37,9 @@ Roxygen: list(markdown = TRUE)
 Suggests:
     rmarkdown,
     knitr,
-    testthat
+    testthat,
+    ggplot2,
+    microbenchmark
 Depends: 
     R (>= 2.10)
 VignetteBuilder: knitr
