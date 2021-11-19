@@ -45,7 +45,7 @@ samc <- function(resistance, absorption = NULL, fidelity = NULL,
       stop("'resistance' must be a numeric matrix")
     }
   } else if (class(resistance) == "RasterLayer"){
-    resistance <- as.matrix(resistance)
+    resistance <- raster::as.matrix(resistance)
   }
   
   if(is.null(directions) & is.null(kernel)){
