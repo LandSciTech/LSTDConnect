@@ -40,8 +40,6 @@ samc <- function(resistance, absorption = NULL, fidelity = NULL,
                  resistance_na_mask = 0, absorption_na_mask = 0, 
                  fidelity_na_mask = 0, symmetric = TRUE) {
   
-  browser()
-  
   if (is.matrix(resistance)){
     if (!is.numeric(resistance)) {
       stop("'resistance' must be a numeric matrix")
