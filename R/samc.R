@@ -40,12 +40,14 @@ samc <- function(resistance, absorption = NULL, fidelity = NULL,
                  resistance_na_mask = 0, absorption_na_mask = 0, 
                  fidelity_na_mask = 0, symmetric = TRUE) {
   
+  browser()
+  
   if (is.matrix(resistance)){
     if (!is.numeric(resistance)) {
       stop("'resistance' must be a numeric matrix")
     }
   } else if (class(resistance) == "RasterLayer"){
-    resistance <- as.matrix(resistance)
+    resistance <- raster::as.matrix(resistance)
   }
   
   if(is.null(directions) & is.null(kernel)){
@@ -163,7 +165,7 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
       stop("'occ' must be a numeric matrix")
     }
   } else if (class(occ) == "RasterLayer"){
-    occ <- as.matrix(occ)
+    occ <- raster::as.matrix(occ)
   }
   
   warned_about_rounding <- FALSE
