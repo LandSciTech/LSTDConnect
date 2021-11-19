@@ -4,3 +4,5 @@ scripts
 input
 ^README\.Rmd$
 ^\.github$
+^doc$
+^Meta$

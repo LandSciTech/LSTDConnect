@@ -10,3 +10,5 @@ output
 *.so
 *.dll
 inst/doc
+/doc/
+/Meta/

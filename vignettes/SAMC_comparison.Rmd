@@ -1,5 +1,5 @@
 ---
-title: "SAMC_comparison"
+title: "SAMC Comparison"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{SAMC_comparison}
@@ -14,6 +14,124 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-library(LSTDConnect)
+### Setup
+
+You must install from github, from the **paper** branch (important). 
+
+```{r install, eval=FALSE}
+devtools::install_github("LandSciTech/LSTDConnect", 
+                         ref = "paper")
 ```
+
+We load the package along with `raster` and `samc`. We also load the `microbenchmark` package to benchmark code performance. We will use ggplot for some visualizations.
+
+```{r load_libs}
+library(LSTDConnect)
+library(raster)
+library(samc)
+library(microbenchmark)
+library(ggplot2)
+```
+
+Then, access the buolt-in dataset, `ghm`. This raster represent habitat resistance for a small part of Canada (100 cells squares, at a resolution of 1 km).
+
+```{r get_data}
+res <- LSTDConnect::ghm
+plot(res)
+```
+
+### Running SAMC in paralell
+
+`LSTDconnect` is optimized to obtain the transient distributions from a SAMC calculation. We will ise the `ghm` layer as resistance and will use the opposite layer for occupancy `occ` such as `occ = 1-res`.
+
+```{r get_occ}
+occ <- 101 - res
+plot(occ)
+```
+
+Mortality is built from resisatnce such as when resistance is larger than 80, mortality is high whereas under 80, it is low.
+
+```{r get_mort}
+high_mort <- 0.25
+low_mort <- 0.01
+cutoff <- 80
+
+mort <- res
+mort[mort >= cutoff] <- high_mort
+mort[mort < cutoff] <- low_mort
+```
+
+We first run `LSTDConnect::samc` to prepare the data for the computation.
+
+```{r step_1}
+samc_cache <- LSTDConnect::samc(resistance = res, absorption = mort, 
+                                directions = 4)
+```
+
+We then use `LSTDConnect::distribution`, analogous to `samc::distribution`, to get the transient distribution of individuals for a given time step. We get a 2 elements list, which can be 
+
+```{r step_2}
+dists <- LSTDConnect::distribution(samc = samc_cache, occ = occ, time = 1000)
+plot(dists$occ)
+```
+
+### Comparison with the original samc package
+
+We can compare the results with those given by the `samc` package.
+
+```{r samc_samc}
+tr_list <- list(fun = function(x) 1 / mean(x),
+                dir = 8, 
+                sym = TRUE)
+
+samc_cache_comp <- samc::samc(data = res, absorption = mort, tr_args = tr_list)
+dists_comp <- samc::distribution(samc = samc_cache_comp, occ = occ, time = 1000)
+dists_mapped <- map(samc_cache_comp, dists_comp)
+plot(dists_mapped)
+```
+
+Let's look at the differences. We can see the error is extremely small
+
+```{r comp}
+diff <- dists_mapped - dists$occ
+plot(diff)
+```
+
+```{r comp_hist}
+hist(values(diff), main = "Error")
+```
+
+Let's now benchmark and compare the speed of these two packages by running each process 100 times
+
+```{r}
+t <- 1000
+
+samc_obj <- samc::samc(data = res,
+                       absorption = mort,
+                       tr_args = tr_list)  
+samc_obj_custom <- LSTDConnect::samc(resistance = res, 
+                                     absorption = mort, 
+                                     directions = 8)
+
+mbm <- microbenchmark(
+  "samc" = {
+    short_disp <- samc::distribution(samc = samc_obj,
+                                     occ = mort,
+                                     time = t)
+    gc()
+  },
+  "LSTDConnect" = {
+    short_disp_custom <- LSTDConnect::distribution(samc = samc_obj_custom,
+                                                   occ = occ, 
+                                                   time = t)
+    gc()
+  },
+  times = 100,
+  unit = "s") 
+mbm
+```
+
+```{r benchmark_plot}
+plot(mbm)
+```
+
