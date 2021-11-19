@@ -40,13 +40,9 @@ samc <- function(resistance, absorption = NULL, fidelity = NULL,
                  resistance_na_mask = 0, absorption_na_mask = 0, 
                  fidelity_na_mask = 0, symmetric = TRUE) {
   
-  if (is.matrix(resistance)){
-    if (!is.numeric(resistance)) {
-      stop("'resistance' must be a numeric matrix")
-    }
-  } else if (class(resistance) == "RasterLayer"){
-    resistance <- raster::as.matrix(resistance)
-  }
+  resistance <- .check_inputs(resistance, "resistance")
+  absorption <- .check_inputs(absorption, "absorption")
+  fidelity <- .check_inputs(fidelity, "fidelity")
   
   if(is.null(directions) & is.null(kernel)){
     stop(paste0("You must provide one of 'directions' (num value of 4 or 8) OR",
@@ -102,11 +98,17 @@ samc <- function(resistance, absorption = NULL, fidelity = NULL,
   # -------------------------------------------------------------------------
   
   if (is.null(absorption)) {
+    
     absorption <- matrix(0, nrow(resistance), ncol(resistance))
+    
   } else if (is.numeric(absorption) && !is.matrix(absorption)) {
+    
     absorption <- matrix(absorption, nrow(resistance), ncol(resistance))
+    
   } else if (!is.numeric(absorption) || !is.matrix(absorption)) {
-    stop("absorption must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no absorption")
+    
+    stop("absorption must be a numeric matrix of the same dimentions as resistance, 
+         or a numeric to be used to create such a matrix, or null to default to no absorption")
   }
   
   if (!all(dim(resistance) == dim(absorption))) {
@@ -118,7 +120,8 @@ samc <- function(resistance, absorption = NULL, fidelity = NULL,
   } else if (is.numeric(fidelity) && !is.matrix(fidelity)) {
     fidelity <- matrix(fidelity, nrow(resistance), ncol(resistance))
   } else if (!is.numeric(fidelity) || !is.matrix(fidelity)) {
-    stop("fidelity must be a numeric matrix of the same dimentions as resistance, or a numeric to be used to create such a matrix, or null to default to no fidelity")
+    stop("fidelity must be a numeric matrix of the same dimentions as resistance, 
+         or a numeric to be used to create such a matrix, or null to default to no fidelity")
   }
   
   if (!all(dim(resistance) == dim(fidelity))) {
@@ -162,8 +165,11 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
     if (!is.numeric(occ)) {
       stop("'occ' must be a numeric matrix")
     }
+    input_is_raster <- FALSE
   } else if (class(occ) == "RasterLayer"){
+    origin <- occ
     occ <- raster::as.matrix(occ)
+    input_is_raster <- TRUE
   }
   
   warned_about_rounding <- FALSE
@@ -191,7 +197,14 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
     stop("Dead has the wrong width")
   }
   
-  return(samc_step_cpp(time, samc, occ, dead))
+  results_list <- samc_step_cpp(time, samc, occ, dead)
+  
+  if (input_is_raster){
+    results_list[2:3] <- lapply(results_list[2:3], .make_raster, 
+                                template = origin)
+  }
+  
+  return(results_list)
 }
 
 # Helpers -----------------------------------------------------------------
@@ -212,4 +225,21 @@ distribution <- function(samc, occ, time = 1, dead = NULL) {
   return(acc - LSTDConnect::distribution(
     LSTDConnect::samc(resistance, fidelity, absorption, directions), 
     occ, time = 1)[["occ"]][[1]])
+}
+
+.make_raster <- function(mat, template){
+  raster::raster(mat[[1]], template = template)
+}
+
+.check_inputs <- function(input, name){
+  if(!is.null(input)){
+    if (is.matrix(input)){
+      if (!is.numeric(input)) {
+        stop(paste0("'", name, "' must be a numeric matrix"))
+      }
+    } else if (class(input) == "RasterLayer"){
+      input <- raster::as.matrix(input)
+    }
+  }
+  return(input)
 }
