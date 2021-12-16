@@ -21,17 +21,9 @@ License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    methods,
     raster,
-    dplyr,
-    rgeos,
-    sp,
-    data.table,
-    igraph,
     samc,
-    Rcpp,
-    SpaDES.tools,
-    plyr
+    Rcpp
 LinkingTo: Rcpp
 RoxygenNote: 7.1.2
 Roxygen: list(markdown = TRUE)
