@@ -13,7 +13,8 @@ Authors@R: c(
                   Minister of Environment and Climate Change",
            role = c("cph")))
 Date: 2020-02-12
-URL: https://github.com/LandSciTech/LSTDConnect/
+URL: https://github.com/LandSciTech/LSTDConnect/,
+    https://landscitech.github.io/LSTDConnect/
 Description: Connectivity and distance weighted sum methods. This package is in 
     development, and may or may not function.
 License: file LICENSE
