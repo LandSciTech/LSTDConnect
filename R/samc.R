@@ -136,11 +136,11 @@ samc <- function(resistance, absorption = NULL, fidelity = NULL,
     stop("resistance must > 0")
   }
   
-  if (any(0 > absorption || absorption > 1)) {
+  if (any(absorption < 0) || any(absorption > 1)) {
     stop("absorption must be in the range [0,1]")
   }
   
-  if (any(0 > fidelity || fidelity > 1)) {
+  if (any(fidelity < 0) || any(fidelity > 1)) {
     stop("fidelity must be in the range [0,1]")
   }
   
