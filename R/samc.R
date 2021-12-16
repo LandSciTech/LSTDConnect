@@ -34,16 +34,15 @@ NULL
 #' `distribution` will also return a list.
 #' 
 #' @examples 
+#' library(raster)
 #' res <- LSTDConnect::ghm
 #' occ <- 101 - res
-#' 
 #' high_mort <- 0.25
 #' low_mort <- 0.01
 #' cutoff <- 80
 #' mort <- res
 #' mort[mort >= cutoff] <- high_mort
 #' mort[mort < cutoff] <- low_mort
-#' 
 #' samc_cache <- LSTDConnect::samc(resistance = res, absorption = mort, 
 #'                                 directions = 4)
 #' dists <- LSTDConnect::distribution(samc = samc_cache, occ = occ, time = 1000)
