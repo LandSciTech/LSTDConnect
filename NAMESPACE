@@ -2,7 +2,6 @@
 
 export(distribution)
 export(exponentialKernel)
-export(getDistKernelFromMax)
 export(samc)
 export(uniformKernel)
 importFrom(Rcpp,evalCpp)

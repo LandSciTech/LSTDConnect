@@ -12,6 +12,7 @@ Connectivity and distance weighted sum methods. This package is in development, 
 Useful links:
 \itemize{
   \item \url{https://github.com/LandSciTech/LSTDConnect/}
+  \item \url{https://landscitech.github.io/LSTDConnect/}
 }
 
 }

@@ -12,6 +12,10 @@
 #' @return 
 #' A kernel (`matrix`).
 #' 
+#' @examples 
+#' uniformKernel(r = 1, mu = 2)
+#' exponentialKernel(mu = 2)
+#' 
 #' @rdname kernels
 #' @export
 uniformKernel <- function(r=NULL, mu=NULL, cellDim = 1) {

@@ -2,16 +2,16 @@
 % Please edit documentation in R/kernels-utils.R
 \name{getDistKernelFromMax}
 \alias{getDistKernelFromMax}
-\title{TODO}
+\title{Get kernel distance from maximum}
 \usage{
 getDistKernelFromMax(kdim)
 }
 \arguments{
-\item{kdim}{TODO}
+\item{kdim}{kernel dimensions.}
 }
 \value{
-TODO
+A matrix.
 }
 \description{
-TODO
+Calculates distance d from kernel dimensions.
 }

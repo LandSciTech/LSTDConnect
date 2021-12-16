@@ -26,3 +26,8 @@ A kernel (\code{matrix}).
 \description{
 Creates a convolution kernel
 }
+\examples{
+uniformKernel(r = 1, mu = 2)
+exponentialKernel(mu = 2)
+
+}
