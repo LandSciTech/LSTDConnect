@@ -127,11 +127,12 @@ mbm <- microbenchmark(
     gc()
   },
   times = 100,
-  unit = "s") 
+  unit = "s", 
+  control = list(order = "block")) 
 mbm
 ```
 
 ```{r benchmark_plot}
-plot(mbm)
+boxplot(mbm)
 ```
 
