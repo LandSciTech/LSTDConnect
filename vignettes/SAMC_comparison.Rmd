@@ -86,7 +86,7 @@ tr_list <- list(fun = function(x) 1 / mean(x),
 
 samc_cache_comp <- samc::samc(data = res, absorption = mort, tr_args = tr_list)
 dists_comp <- samc::distribution(samc = samc_cache_comp, occ = occ, time = 1000)
-dists_mapped <- map(samc_cache_comp, dists_comp)
+dists_mapped <- samc::map(samc_cache_comp, dists_comp)
 plot(dists_mapped)
 ```
 
