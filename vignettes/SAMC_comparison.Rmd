@@ -65,7 +65,7 @@ We first run `LSTDConnect::samc` to prepare the data for the computation.
 
 ```{r step_1}
 samc_cache <- LSTDConnect::samc(resistance = res, absorption = mort, 
-                                directions = 4)
+                                directions = 8)
 ```
 
 We then use `LSTDConnect::distribution`, analogous to `samc::distribution`, to get the transient distribution of individuals for a given time step. We get a 2 elements list, which can be 
