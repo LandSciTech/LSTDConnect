@@ -16,11 +16,8 @@ knitr::opts_chunk$set(
 
 ### Setup
 
-You must install from github, from the **paper** branch (important). 
-
 ```{r install, eval=FALSE}
-devtools::install_github("LandSciTech/LSTDConnect", 
-                         ref = "paper")
+devtools::install_github("LandSciTech/LSTDConnect")
 ```
 
 We load the package along with `raster` and `samc`. We also load the `microbenchmark` package to benchmark code performance. We will use ggplot for some visualizations.
@@ -49,7 +46,7 @@ occ <- 101 - res
 plot(occ)
 ```
 
-Mortality is built from resisatnce such as when resistance is larger than 80, mortality is high whereas under 80, it is low.
+Mortality is built from resistance so that when resistance is larger than 80, mortality is high whereas under 80, it is low.
 
 ```{r get_mort}
 high_mort <- 0.25
