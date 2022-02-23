@@ -2,7 +2,7 @@
 title: "SAMC Comparison"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{SAMC_comparison}
+  %\VignetteIndexEntry{SAMC Comparison}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

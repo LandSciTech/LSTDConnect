@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Josie Hughes \email{josie.hughes@canada.ca}
+\strong{Maintainer}: Josie Hughes \email{josie.hughes@ec.gc.ca}
 
 Authors:
 \itemize{
