@@ -20,8 +20,6 @@ samc(
 distribution(samc, occ, time = 1, dead = NULL)
 }
 \arguments{
-\item{resistance}{Deprecated. Use the \code{data} parameter.}
-
 \item{absorption}{A \code{\link[raster]{RasterLayer-class}} or \code{\link[base]{matrix}}}
 
 \item{fidelity}{A \code{\link[raster]{RasterLayer-class}} or \code{\link[base]{matrix}}}
