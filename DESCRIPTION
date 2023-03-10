@@ -3,7 +3,7 @@ Type: Package
 Title: ECCC Landscape Science & Technology Division Connectivity Analysis Tools
 Version: 0.1.0
 Authors@R: c(
-    person("Griffin", "Barrett", email = "griffin-barrett@outlook.com", 
+    person("Griffin", "Barrett", email = "xlirate@live.ca", 
            role = c("aut")), 
     person("Valentin", "Lucet", email = "valentin.lucet@gmail.com", 
            role = c("aut")),
